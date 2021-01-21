@@ -95,12 +95,18 @@ Data is collected from people in over 150 countries. Each variable measured reve
 Each country is also compared against a hypothetical nation called Dystopia. Dystopia represents the lowest national averages for each key variable and is, along with residual error, used as a regression benchmark. The six metrics are used to explain the estimated extent to which each of these factors contribute to increasing life satisfaction when compared to the hypothetical nation of Dystopia, but they themselves do not have an impact on the total score reported for each country
 
 ```{r reading-happiness-datasets}
-happiness_2015 <- read.csv("2015.csv")
-happiness_2016 <- read.csv("2016.csv")
-happiness_2017 <- read.csv("2017.csv")
-happiness_2018 <- read.csv("2018.csv")
-happiness_2019 <- read.csv("2019.csv")
-happiness_2020 <- read.csv("2020.csv")
+happiness_2015 <- read.csv("2015.csv") %>% mutate(year = 2015)
+happiness_2016 <- read.csv("2016.csv") %>% mutate(year = 2016)
+happiness_2017 <- read.csv("2017.csv") %>% mutate(year = 2017)
+happiness_2018 <- read.csv("2018.csv") %>% mutate(year = 2018)
+happiness_2019 <- read.csv("2019.csv") %>% mutate(year = 2019)
+happiness_2020 <- read.csv("2020.csv") %>% mutate(year = 2020)
+
+#colnames(happiness_2015) = c("country", "region", "variable3", ...)
+
+
+happiness <- happiness_2015 %>% bind_rows(happiness_2016) %>% bind_rows(happiness_2017) %>%
+  bind_rows(happiness_2018) %>% bind_rows(happiness_2019) %>% bind_rows(happiness_2020)
 ```
 
 ## Exploration
