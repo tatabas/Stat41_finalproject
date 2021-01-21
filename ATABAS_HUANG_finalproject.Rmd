@@ -2,12 +2,28 @@
 title: "Final Project"
 author: "Tolga Atabas and Sherry Huang"
 date: "1/20/2021"
-output: pdf_document
+output:
+  pdf_document:
+    fig_caption: yes
 urlcolor: blue
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(ggthemes)
+library(tidyverse)
+library(dplyr)
+```
+
+```{r plot themes, echo = FALSE, message = FALSE, warning = FALSE}
+theme_proj = theme_tufte() + 
+  theme(plot.title.position = "plot")
+```
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+spotify <- read.csv("data.csv")
+spotify_by_year <- read.csv("data_by_year.csv")
 ```
 
 ## Introduction
@@ -28,13 +44,27 @@ Other trends in music, and art in general, can illuminate these trends. Seeing t
 
 Change in music is not limited to different life periods, but is also present in different phases in one’s life. For example, there is a popular practice for pregnant mothers to play classical music for their babies in hopes of making them more intelligent. In other phases of life, teens may be warned to stay away from certain genres of music because it will “rot their brains” or act as a bad influence. In either case, music enters our lives early. Many young musical prodigies are discovered because they begin reacting to music even before they are able to speak or walk.
 
-Our plan for this study relies on a comprehensive data set supplied by the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). This data encompasses many interesting variables, and there is much to experiment with. It provides a fertile ground for exploration into how music affects humans. Two variables specifically are eye-catching: valence, a measure of the happiness of a song, and explicitness, whether a song contains explicit lyrics or not. There are also variables regarding year published, popularity, acousticness, etc. There is a perceived trend that current music (2010-2020) is becoming more and more explicit and despairing. In fact, this can be seen in Figure 1 with a dip in valence after 1975. It may be possible to look at these different characteristics in acousticness, valence, and explicitness to create a model that predicts the popularity of music. 
+Our plan for this study relies on a comprehensive data set supplied by the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). This data encompasses many interesting variables, and there is much to experiment with. It provides a fertile ground for exploration into how music affects humans. Two variables specifically are eye-catching: valence, a measure of the happiness of a song, and explicitness, whether a song contains explicit lyrics or not. There are also variables regarding year published, popularity, acousticness, etc. There is a perceived trend that current music (2010-2020) is becoming more and more explicit and despairing. In fact, this can be seen in Figure \ref{fig:scatvalyear} with a dip in valence after 1975. It may be possible to look at these different characteristics in acousticness, valence, and explicitness to create a model that predicts the popularity of music. 
+
+```{r figs, echo=FALSE, fig.width=5,fig.height=3,fig.cap="\\label{fig:scatvalyear}Scatterplot of Spotify's valence score by year"}
+
+ggplot(data = spotify_by_year) +
+  geom_point(mapping = aes(x = year, y = valence)) +
+  labs(title = "Happiness of Music Over Time",
+       x = "Year",
+       y = "Valence (0 to 1)",
+       caption = "SOURCE: Spotify") +
+  theme_proj +
+  #need to add gridlines because tufte removes them
+  theme(panel.grid.major = element_line(color = "gray90"),
+        panel.grid.minor = element_line(color = "gray90"))
+```
 
 In addition to a study of trends in music consumption, this study aims to take a closer look at correlations between the music dataset and other datasets in mental health and crime. Is it possible that the prevalence in explicit music is rising with crime rates? Is it possible that the decrease in valence score is correlated with an increase in mental health cases? These questions will be discussed in the subsequent sections.
 
 ## Data
 
-<u> Music: <\u>
+Music:
 The music dataset is made available through the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). Spotify is an audio streaming service that was launched in 2008 and is now one of the most popular streaming platforms for music and podcasts. Therefore, the dataset is fairly comprehensive and contains lots of  information due to Spotify’s status as one of the most popular sites for music consumption. 
 
 The data encompasses many interesting variables. Of course there are descriptors such as artist or band name, year of song, genre, and key, but there are many other metrics that require more attention.
@@ -43,4 +73,17 @@ These specially catered metrics usually range from 0 to 1. For example Spotify d
 
 Other metrics such as explicitness are described as follows: “Whether or not the episode has explicit content (true = yes it does; false = no it does not OR unknown)”. Whereas danceability is described as: “Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable”. 
 
-<u> Crime: </u>
+Crime:
+
+## Exploration
+
+There are some natural thoughts that may come up when thinking about what two characteristics in music may support each other, or on the other hand, go against each other.
+
+```{r figs, echo=FALSE, message = FALSE, warning = FALSE, fig.width=5,fig.height=3,fig.cap="\\label{fig:gallyspotify}Pairs plot for the variables in the Spotify dataset"}
+library(GGally)
+
+spotify_by_year %>%
+  select(valence, acousticness, danceability, duration_ms, energy, instrumentalness, liveness, loudness, popularity, speechiness) %>%
+  GGally::ggpairs()
+
+```
