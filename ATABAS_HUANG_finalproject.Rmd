@@ -75,9 +75,37 @@ Other metrics such as explicitness are described as follows: “Whether or not t
 
 Crime:
 
+World Happiness:
+
+The first World Happiness Report was released on April 1, 2012 as a foundational text for the UN High Level Meeting: Well-being and Happiness: Defining a New Economic Paradigm, drawing international attention. The report outlined the state of world happiness, causes of happiness and misery, and policy implications highlighted by case studies. In 2013, the second World Happiness Report was issued, and since then has been issued on an annual basis with the exception of 2014. The report primarily uses data from the Gallup World Poll.
+
+The rankings of national happiness are based on a Cantril ladder survey. Nationally representative samples of respondents are asked to think of a ladder, with the best possible life for them being a 10, and the worst possible life being a 0. They are then asked to rate their own current lives on that 0 to 10 scale. The report correlates the results with various life factors.
+
+In the reports, experts in fields including economics, psychology, survey analysis, and national statistics, describe how measurements of well-being can be used effectively to assess the progress of nations, and other topics. Each report is organized by chapters that delve deeper into issues relating to happiness, including mental illness, the objective benefits of happiness, the importance of ethics, policy implications, and links with the Organization for Economic Co-operation and Development's (OECD) approach to measuring subjective well-being and other international and national efforts.
+
+Data is collected from people in over 150 countries. Each variable measured reveals a populated-weighted average score on a scale running from 0 to 10 that is tracked over time and compared against other countries. These variables currently include:
+
++ real GDP per capita
++ social support
++ healthy life expectancy
++ freedom to make life choices
++ generosity
++ perceptions of corruption
+
+Each country is also compared against a hypothetical nation called Dystopia. Dystopia represents the lowest national averages for each key variable and is, along with residual error, used as a regression benchmark. The six metrics are used to explain the estimated extent to which each of these factors contribute to increasing life satisfaction when compared to the hypothetical nation of Dystopia, but they themselves do not have an impact on the total score reported for each country
+
+```{r reading-happiness-datasets}
+happiness_2015 <- read.csv("2015.csv")
+happiness_2016 <- read.csv("2016.csv")
+happiness_2017 <- read.csv("2017.csv")
+happiness_2018 <- read.csv("2018.csv")
+happiness_2019 <- read.csv("2019.csv")
+happiness_2020 <- read.csv("2020.csv")
+```
+
 ## Exploration
 
-There are some natural thoughts that may come up when thinking about what two characteristics in music may support each other, or on the other hand, go against each other. For example, one may think that acousticness and energy of a song are not necessarily compatible traits, however danceability and loudness may hold promise in a positive correlation. The pairs plot in Figure \ref{fig:gallyspotify} explores these relationships and corellations.
+There are some natural thoughts that may come up when thinking about what two characteristics in music may support each other, or on the other hand, go against each other. For example, one may think that acousticness and energy of a song are not necessarily compatible traits, however danceability and loudness may hold promise in a positive correlation. The pairs plot in Figure \ref{fig:gallyspotify} explores these relationships and correlations.
 
 ```{r gally, echo=FALSE, message = FALSE, warning = FALSE, fig.width=8,fig.height=8,fig.cap="\\label{fig:gallyspotify}Pairs plot for the variables in the Spotify dataset"}
 library(GGally)
@@ -87,3 +115,4 @@ spotify_by_year %>%
   GGally::ggpairs()
 
 ```
+
