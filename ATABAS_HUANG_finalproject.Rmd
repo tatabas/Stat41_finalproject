@@ -46,7 +46,7 @@ Change in music is not limited to different life periods, but is also present in
 
 Our plan for this study relies on a comprehensive data set supplied by the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). This data encompasses many interesting variables, and there is much to experiment with. It provides a fertile ground for exploration into how music affects humans. Two variables specifically are eye-catching: valence, a measure of the happiness of a song, and explicitness, whether a song contains explicit lyrics or not. There are also variables regarding year published, popularity, acousticness, etc. There is a perceived trend that current music (2010-2020) is becoming more and more explicit and despairing. In fact, this can be seen in Figure \ref{fig:scatvalyear} with a dip in valence after 1975. It may be possible to look at these different characteristics in acousticness, valence, and explicitness to create a model that predicts the popularity of music. 
 
-```{r figs, echo=FALSE, fig.width=5,fig.height=3,fig.cap="\\label{fig:scatvalyear}Scatterplot of Spotify's valence score by year"}
+```{r scatter, echo=FALSE, fig.width=5,fig.height=3,fig.cap="\\label{fig:scatvalyear}Scatterplot of Spotify's valence score by year"}
 
 ggplot(data = spotify_by_year) +
   geom_point(mapping = aes(x = year, y = valence)) +
@@ -77,9 +77,9 @@ Crime:
 
 ## Exploration
 
-There are some natural thoughts that may come up when thinking about what two characteristics in music may support each other, or on the other hand, go against each other.
+There are some natural thoughts that may come up when thinking about what two characteristics in music may support each other, or on the other hand, go against each other. For example, one may think that acousticness and energy of a song are not necessarily compatible traits, however danceability and loudness may hold promise in a positive correlation. The pairs plot in Figure \ref{fig:gallyspotify} explores these relationships and corellations.
 
-```{r figs, echo=FALSE, message = FALSE, warning = FALSE, fig.width=5,fig.height=3,fig.cap="\\label{fig:gallyspotify}Pairs plot for the variables in the Spotify dataset"}
+```{r gally, echo=FALSE, message = FALSE, warning = FALSE, fig.width=8,fig.height=8,fig.cap="\\label{fig:gallyspotify}Pairs plot for the variables in the Spotify dataset"}
 library(GGally)
 
 spotify_by_year %>%
