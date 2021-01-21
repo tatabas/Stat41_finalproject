@@ -1,0 +1,46 @@
+---
+title: "Final Project"
+author: "Tolga Atabas and Sherry Huang"
+date: "1/20/2021"
+output: pdf_document
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Music has an incredibly fascinating effect on people. Humans are one of the few, if not the only, animals that can naturally feel rhythms. When music is played, it only takes moments for people to clap along to the beat of the song. Specific genres and styles of music have defined generations and cultures time and time again. It’s only natural for music to be so powerful for people.
+
+This notion has picked up much attention in the media. In fact, ABC Science released a video a few years ago ( [watch it here](https://www.youtube.com/watch?v=rnUSNbqtVJI) ). discussing the power of music on the brain, specifically for people with dementia and Parkinson’s. In the video, researchers showed how playing music reminiscent of one’s past can trigger memories, even for someone who has forgotten them. They did so by curating specially tailored playlists from the pasts of certain residents at a nursing home. When the dementia patients listened to these playlists, many of them had a sudden shift in mood. Their family members were so surprised to see them “come back to life,” in a sense. These residents would talk about their past and be more open and happy than they had been in months.
+
+Another segment of the video showed how music can help with diseases that affect the motor system, like Parkinson’s. At a human movement lab, a professor has spent years analyzing and trying to solve these movement disorders. One thing she tried was playing music, and it’s incredible to see the change that overcomes her patients. John, one of her patients, suffers from Parkinson’s. The video shows how the debilitating disease limits his natural motor skills and prevents him from having voluntary movements. However, after applying a nice tune with the professor’s music, John is able to not only walk, but dance with a partner.
+
+The last part of the video follows a man named Shane who suffered severe brain damage from a bike accident. Following the accident, he could barely speak, move, and recall anything. Later, he became part of an experiment to see if music could invoke memories for people who had severe memory loss from brain injuries. The results showed that he did as well as people with normal, healthy brains, despite the accident. For example, Shane had trouble recalling a memory from grade school if he was just asked to, but had no issues doing so if a song from grade school was being played.
+
+This video illustrates not only the power in music, but its prevalence in our natural being. It is much more than a form of entertainment, it is part of a complete life. The rhythm and tunes of songs -- whether from traditional instruments, natural sounds, or digital playlists -- bury themselves in our brains and become an integral part of human life. 
+
+Additionally, music is not immune to the various societal trends that can morph and change over time. Since it is a form of art, it generally reflects on what major feelings and emotions are being spread in a given time. The prevalence of music in our lives combined with the artistic essence makes it a strong vantage point when looking at how society changes the way it expresses itself. For example, there are times in the late 1940’s and 1950’s where songs tend to be filled with sad or melancholic lyrics, making for more of a “low-mood” song. This has much to do with the major wars at the time, namely World War II and the subsequent Cold War. 
+
+Other trends in music, and art in general, can illuminate these trends. Seeing the trends in how artists express their views of the world provides a look into life at during a given time period. Furthermore, the advantageous point with music is also that the popularity of a song or genre can be tracked. Music therefore not only gives a perspective on what songs and emotions are being produced in a given time, but to what extent each is consumed. So, it is possible to look at both the expressed emotions in music, and how much it resonates with listeners.
+
+Change in music is not limited to different life periods, but is also present in different phases in one’s life. For example, there is a popular practice for pregnant mothers to play classical music for their babies in hopes of making them more intelligent. In other phases of life, teens may be warned to stay away from certain genres of music because it will “rot their brains” or act as a bad influence. In either case, music enters our lives early. Many young musical prodigies are discovered because they begin reacting to music even before they are able to speak or walk.
+
+Our plan for this study relies on a comprehensive data set supplied by the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). This data encompasses many interesting variables, and there is much to experiment with. It provides a fertile ground for exploration into how music affects humans. Two variables specifically are eye-catching: valence, a measure of the happiness of a song, and explicitness, whether a song contains explicit lyrics or not. There are also variables regarding year published, popularity, acousticness, etc. There is a perceived trend that current music (2010-2020) is becoming more and more explicit and despairing. In fact, this can be seen in Figure 1 with a dip in valence after 1975. It may be possible to look at these different characteristics in acousticness, valence, and explicitness to create a model that predicts the popularity of music. 
+
+In addition to a study of trends in music consumption, this study aims to take a closer look at correlations between the music dataset and other datasets in mental health and crime. Is it possible that the prevalence in explicit music is rising with crime rates? Is it possible that the decrease in valence score is correlated with an increase in mental health cases? These questions will be discussed in the subsequent sections.
+
+## Data
+
+<u> Music: <\u>
+The music dataset is made available through the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). Spotify is an audio streaming service that was launched in 2008 and is now one of the most popular streaming platforms for music and podcasts. Therefore, the dataset is fairly comprehensive and contains lots of  information due to Spotify’s status as one of the most popular sites for music consumption. 
+
+The data encompasses many interesting variables. Of course there are descriptors such as artist or band name, year of song, genre, and key, but there are many other metrics that require more attention.
+
+These specially catered metrics usually range from 0 to 1. For example Spotify describes the metric for the valence (happiness) of a song as follows: “A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry)”.
+
+Other metrics such as explicitness are described as follows: “Whether or not the episode has explicit content (true = yes it does; false = no it does not OR unknown)”. Whereas danceability is described as: “Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable”. 
+
+<u> Crime: </u>
