@@ -102,12 +102,42 @@ happiness_2018 <- read.csv("2018.csv") %>% mutate(year = 2018)
 happiness_2019 <- read.csv("2019.csv") %>% mutate(year = 2019)
 happiness_2020 <- read.csv("2020.csv") %>% mutate(year = 2020)
 
-#colnames(happiness_2015) = c("country", "region", "variable3", ...)
+colnames(happiness_2017) = c("Country", "Happiness.Rank", "Happiness.Score",
+                             "Upper.Confidence.Interval", "Lower.Confidence.Interval",
+                             "Economy..GDP.per.Capita.", "Family", "Health..Life.Expectancy.",
+                             "Freedom", "Generosity", "Trust..Government.Corruption.",
+                             "Dystopia.Residual", "year")
 
+colnames(happiness_2018) = c("Happiness.Rank", "Country", "Happiness.Score",
+                             "Economy..GDP.per.Capita.", "Family", "Health..Life.Expectancy.",
+                             "Freedom", "Generosity", "Trust..Government.Corruption.",
+                             "year")
+
+colnames(happiness_2019) = c("Happiness.Rank", "Country", "Happiness.Score",
+                             "Economy..GDP.per.Capita.", "Family", "Health..Life.Expectancy.",
+                             "Freedom", "Generosity", "Trust..Government.Corruption.",
+                             "year")
+
+colnames(happiness_2020) = c("Country", "Region", "Happiness.Score", "Standard.Error",
+                             "Upper.Confidence.Interval", "Lower.Confidence.Interval",
+                             "Logged.GDP.per.capita", "Family", "Healthy.life.expectancy",
+                             "Freedom", "Generosity", "Trust..Government.Corruption.",
+                             "Ladder.score.in.Dystopia", "Explained.by..Log.GDP.per.capita",
+                             "Explained.by..Social.support",
+                             "Explained.by..Healthy.life.expectancy",
+                             "Explained.by..Freedom.to.make.life.choices",
+                             "Explained.by..Generosity",
+                             "Explained.by..Perceptions.of.corruption",
+                             "Dystopia.Residual", "year")
+
+#happiness_2018 <- happiness_2018 %>% mutate(as.numeric(Trust..Government.Corruption.))
 
 happiness <- happiness_2015 %>% bind_rows(happiness_2016) %>% bind_rows(happiness_2017) %>%
-  bind_rows(happiness_2018) %>% bind_rows(happiness_2019) %>% bind_rows(happiness_2020)
+  bind_rows(happiness_2019) %>% bind_rows(happiness_2020)
 ```
+
+In the above code, I have changed the variable names in each dataset so they should all (mostly) match with each other. Then, I combined all the datasets into one big "happiness" dataset.
+*This still needs a little work because the $2018$ dataset has one variable as "chr" instead of "num," and I can't merge it with the other annual happiness datasets into the big happiness dataset.*
 
 ## Exploration
 
