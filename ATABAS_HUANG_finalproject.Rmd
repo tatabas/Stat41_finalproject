@@ -75,6 +75,21 @@ Other metrics such as explicitness are described as follows: “Whether or not t
 
 Crime:
 
+The United Nations Office on Drugs and Crime (UNODC) has many comprehensive datasets that pertain to crime of all different shapes and forms. The organization, as a subset of the United Nations works to cover pressing concerns related to crime, tackling crime, and preventing crime. The datasets present on their website are grouped in a manner that makes it easy to choose what to study. For example, the differentiation is made between sexual assault, homicide, and drug crimes. Further, homicide can be analyzed more specifically through the different mechanisms (firearm, sharp object, unkown, etc.)
+
+With a dataset of this comprehensive nature, it is possible to make different comparisons by extracting the parts of the data that are of interest. 
+
+Some limitations to this dataset it more about the collection than anything. The data are collected from the annual United Nations crime trends survey from national authorities. This method not only relies on countries reporting to the U.N., but also relies on local authorities within countries like the U.S. and their reports to the federal level. There may be differences in reporting crime when compared to different countries, and that disparity can also exist within any given country, as well. This needs to be kept in consideration when drawing conclusions.
+
+The data from UNODC will be in regards to
+
++ Assault 
++ Robbery
++ Homicide with Firearm
++ Homicide with Sharp Object
++ Drug Deaths
++ Sexual Violence
+
 World Happiness:
 
 The first World Happiness Report was released on April 1, 2012 as a foundational text for the UN High Level Meeting: Well-being and Happiness: Defining a New Economic Paradigm, drawing international attention. The report outlined the state of world happiness, causes of happiness and misery, and policy implications highlighted by case studies. In 2013, the second World Happiness Report was issued, and since then has been issued on an annual basis with the exception of 2014. The report primarily uses data from the Gallup World Poll.
