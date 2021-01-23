@@ -217,7 +217,8 @@ Data is collected from people in over 150 countries. Each variable measured reve
 
 Each country is also compared against a hypothetical nation called Dystopia. Dystopia represents the lowest national averages for each key variable and is, along with residual error, used as a regression benchmark. The six metrics are used to explain the estimated extent to which each of these factors contribute to increasing life satisfaction when compared to the hypothetical nation of Dystopia, but they themselves do not have an impact on the total score reported for each country
 
-```{r reading-happiness-datasets}
+```{r reading-happiness-datasets, echo = FALSE}
+# reading in world happiness datasets
 happiness_2015 <- read.csv("2015.csv") %>% mutate(year = 2015)
 happiness_2016 <- read.csv("2016.csv") %>% mutate(year = 2016)
 happiness_2017 <- read.csv("2017.csv") %>% mutate(year = 2017)
@@ -225,6 +226,7 @@ happiness_2018 <- read.csv("2018.csv") %>% mutate(year = 2018)
 happiness_2019 <- read.csv("2019.csv") %>% mutate(year = 2019)
 happiness_2020 <- read.csv("2020.csv") %>% mutate(year = 2020)
 
+# renaming like variables so we can bind the datasets
 colnames(happiness_2017) = c("Country", "Happiness.Rank", "Happiness.Score",
                              "Upper.Confidence.Interval", "Lower.Confidence.Interval",
                              "Economy..GDP.per.Capita.", "Family", "Health..Life.Expectancy.",
@@ -253,10 +255,14 @@ colnames(happiness_2020) = c("Country", "Region", "Happiness.Score", "Standard.E
                              "Explained.by..Perceptions.of.corruption",
                              "Dystopia.Residual", "year")
 
+# removing United Arab Emirates from happiness_2018 because it made the variable
+# Trust..Government.Corruption. a chr instead of num, preventing us form binding
+# it to the other world happiness datasets
 happiness_2018 <- happiness_2018[-20,]
 happiness_2018 <- happiness_2018 %>% mutate(Trust..Government.Corruption. =
                                               as.numeric(Trust..Government.Corruption.))
 
+# combining all the world happiness datasets
 happiness <- happiness_2015 %>% bind_rows(happiness_2016) %>% bind_rows(happiness_2017) %>%
   bind_rows(happiness_2018) %>% bind_rows(happiness_2019) %>% bind_rows(happiness_2020)
 ```
@@ -278,7 +284,7 @@ spotify_by_year %>%
 
 Before we begin combining the Spotify dataset with other datasets, it's important to look at those datasets individually. For example, how does the World Happiness dataset change over each year? The world map below, in Figure \ref{fig:plotlyhappiness}, is an interactive map that displays the change in world happiness in countries over the years from $2015$ to $2020$. (Hover over countries to see more specific information.)
 
-```{r, fig.cap="\\label{fig:plotlyhappiness}Map of World Happiness from 2015 - 2020"}
+```{r, echo = FALSE, fig.cap="\\label{fig:plotlyhappiness}Map of World Happiness from 2015 - 2020"}
 #loading dataset of each country's ISO code (because plotly needs it to map countries)
 country_code <- read_csv("wikipedia-iso-country-codes.csv")
 
@@ -322,3 +328,4 @@ p1 <- plot_geo(happiness_plotly, locationmode = "world", frame = ~year) %>%
 
 p1
 ```
+
