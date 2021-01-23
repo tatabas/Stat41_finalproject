@@ -14,6 +14,9 @@ library(ggplot2)
 library(ggthemes)
 library(tidyverse)
 library(dplyr)
+library(maps)
+library(plotly)
+library(readr)
 ```
 
 ```{r plot themes, echo = FALSE, message = FALSE, warning = FALSE}
@@ -230,7 +233,7 @@ colnames(happiness_2017) = c("Country", "Happiness.Rank", "Happiness.Score",
 
 colnames(happiness_2018) = c("Happiness.Rank", "Country", "Happiness.Score",
                              "Economy..GDP.per.Capita.", "Family", "Health..Life.Expectancy.",
-                             "Freedom", "Generosity", "Trust..Government.Corruption.2",
+                             "Freedom", "Generosity", "Trust..Government.Corruption.",
                              "year")
 
 colnames(happiness_2019) = c("Happiness.Rank", "Country", "Happiness.Score",
@@ -252,14 +255,13 @@ colnames(happiness_2020) = c("Country", "Region", "Happiness.Score", "Standard.E
 
 happiness_2018 <- happiness_2018[-20,]
 happiness_2018 <- happiness_2018 %>% mutate(Trust..Government.Corruption. =
-                                              as.numeric(Trust..Government.Corruption.2))
+                                              as.numeric(Trust..Government.Corruption.))
 
 happiness <- happiness_2015 %>% bind_rows(happiness_2016) %>% bind_rows(happiness_2017) %>%
   bind_rows(happiness_2018) %>% bind_rows(happiness_2019) %>% bind_rows(happiness_2020)
 ```
 
 In the above code, I have changed the variable names in each dataset so they should all (mostly) match with each other. Then, I combined all the datasets into one big "happiness" dataset.
-*This still needs a little work because the $2018$ dataset has one variable as "chr" instead of "num," and I can't merge it with the other annual happiness datasets into the big happiness dataset.*
 
 ## Exploration
 
@@ -274,3 +276,49 @@ spotify_by_year %>%
 
 ```
 
+Before we begin combining the Spotify dataset with other datasets, it's important to look at those datasets individually. For example, how does the World Happiness dataset change over each year? The world map below, in Figure \ref{fig:plotlyhappiness}, is an interactive map that displays the change in world happiness in countries over the years from $2015$ to $2020$. (Hover over countries to see more specific information.)
+
+```{r, fig.cap="\\label{fig:plotlyhappiness}Map of World Happiness from 2015 - 2020"}
+#loading dataset of each country's ISO code (because plotly needs it to map countries)
+country_code <- read_csv("wikipedia-iso-country-codes.csv")
+
+#joining together happiness and country_code dataset
+happiness_plotly <- left_join(country_code, happiness, by = c("English short name lower case" = "Country"))
+
+#renaming the happiness dataset variables
+colnames(happiness_plotly) = c("Country", "two.code", "three.code", "Numeric.code", "ISO",
+                        "Region", "Happiness.Rank", "Happiness.Score", "Standard.Error",
+                        "Economy..GDP.per.Capita.", "Family", "Health..Life.Expectancy.",
+                        "Freedom", "Trust..Government.Corruption.", "Generosity",
+                        "Dystopia.Residual", "year", "Lower.Confidence.Interval",
+                        "Upper.Confidence.Interval", "Logged.GDP.per.capita",
+                        "Healthy.life.expectancy", "Ladder.score.in.Dystopia",
+                        "Explained.by..Log.GDP.per.capita", "Explained.by..Social.support",
+                        "Explained.by..Healthy.life.expectancy",
+                        "Explained.by..Freedom.to.make.life.choices",
+                        "Explained.by..Generosity",
+                        "Explained.by..Perceptions.of.corruption")
+
+#"hover" variable: this specifies what info is displayed when you hover over a country
+happiness_plotly <- happiness_plotly %>% mutate(hover = paste0(Country, "\nHappiness Rank: ", Happiness.Rank, "\nHappiness Score: ", Happiness.Score))
+
+#hover label aesthetics
+fontStyle <- list(family = "Arial", size = 15, color = "black")
+label <- list(bgcolor = "#EEEEEE", bordercolor = "transparent", font = fontStyle)
+
+#plotly map!
+p1 <- plot_geo(happiness_plotly, locationmode = "world", frame = ~year) %>%
+  add_trace(locations = ~three.code,
+            z = ~Happiness.Score,
+            zmin = 2,
+            zmax = 8,
+            color = ~Happiness.Score,
+            colorscale = "Electric", #changes color of scale
+            text = ~hover, #displays info in "hover" variable we made above
+            hoverinfo = "text") %>% #makes hover info the text from above line
+  layout(font = list(family = "Arial"), title = "World Happiness Report \n 2015 - 2020") %>%
+  style(hoverlabel = label) %>%
+  config(displayModeBar = FALSE) #hides the plotly toolbar in top right
+
+p1
+```
