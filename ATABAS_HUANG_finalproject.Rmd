@@ -110,7 +110,7 @@ colnames(happiness_2017) = c("Country", "Happiness.Rank", "Happiness.Score",
 
 colnames(happiness_2018) = c("Happiness.Rank", "Country", "Happiness.Score",
                              "Economy..GDP.per.Capita.", "Family", "Health..Life.Expectancy.",
-                             "Freedom", "Generosity", "Trust..Government.Corruption.",
+                             "Freedom", "Generosity", "Trust..Government.Corruption.2",
                              "year")
 
 colnames(happiness_2019) = c("Happiness.Rank", "Country", "Happiness.Score",
@@ -130,10 +130,12 @@ colnames(happiness_2020) = c("Country", "Region", "Happiness.Score", "Standard.E
                              "Explained.by..Perceptions.of.corruption",
                              "Dystopia.Residual", "year")
 
-#happiness_2018 <- happiness_2018 %>% mutate(as.numeric(Trust..Government.Corruption.))
+happiness_2018 <- happiness_2018[-20,]
+happiness_2018 <- happiness_2018 %>% mutate(Trust..Government.Corruption. =
+                                              as.numeric(Trust..Government.Corruption.2))
 
 happiness <- happiness_2015 %>% bind_rows(happiness_2016) %>% bind_rows(happiness_2017) %>%
-  bind_rows(happiness_2019) %>% bind_rows(happiness_2020)
+  bind_rows(happiness_2018) %>% bind_rows(happiness_2019) %>% bind_rows(happiness_2020)
 ```
 
 In the above code, I have changed the variable names in each dataset so they should all (mostly) match with each other. Then, I combined all the datasets into one big "happiness" dataset.
