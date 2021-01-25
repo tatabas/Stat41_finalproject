@@ -544,8 +544,10 @@ colnames(nasrob) = c("Year", "NAs")
 rm(robbery10, robbery11, robbery12, robbery13, robbery14, robbery15, robbery16, robbery17)
 ```
 
-```{r robbery}
-robbery %>%
+```{r robbery, fig.width = 5, fig.height= 3}
+library(patchwork)
+
+p1 <- assault %>%
   group_by(Year, Region) %>%
   summarise(
     means = mean(as.numeric(Rate), na.rm = TRUE)
@@ -553,11 +555,29 @@ robbery %>%
   ggplot() +
     geom_col(aes(x = Year, y = means, fill = Year)) +
   theme_proj +
-  #scale_fill_viridis_d(option = "D") +
-  scale_fill_brewer(palette = "OrRd")+
+  scale_fill_brewer(palette = "YlOrRd")+
+  guides(fill = FALSE) +
+  labs(x = "Year", y = "Mean Rate per 100,000 population",
+       title = "Mean Rate of Assault per 100,000 population by Year",
+       caption = "Source: UNODC Serious Assault Data") +
+  theme(plot.title = element_text(size = 8)) +
+  facet_grid(. ~ Region)
+
+p2 <- robbery %>%
+  group_by(Year, Region) %>%
+  summarise(
+    means = mean(as.numeric(Rate), na.rm = TRUE)
+  ) %>%
+  ggplot() +
+    geom_col(aes(x = Year, y = means, fill = Year)) +
+  theme_proj +
+  scale_fill_brewer(palette = "YlOrRd")+
   guides(fill = FALSE) +
   labs(x = "Year", y = "Mean Rate per 100,000 population",
        title = "Mean Rate of Robbery per 100,000 population by Year",
-       caption = "Source: UNODC Serious Assault Data") +
+       caption = "Source: UNODC Robbery Crime Data") +
+  theme(plot.title = element_text(size = 8)) +
   facet_grid(. ~ Region)
+
+p1 + p2
 ```
