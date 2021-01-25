@@ -89,7 +89,7 @@ Since all of these datasets were provided in separate files, it was necessary to
 
 The data also comes in a format that is not easy to work with, having a column of rate and count for each year (i.e. rate of crime, count of crime). The years available are from 2010 to 2017.
 
-```{r}
+```{r ASSAULT}
 library(readxl)
 
 #2010
@@ -415,7 +415,7 @@ server <- function(input, output) {
           theme(panel.grid.major = element_line(color = "gray90"),
                 panel.grid.minor = element_line(color = "gray90"),
                 legend.position = "none") +
-          labs(x = "Year", y = "Assault rate (per 100,000 population",
+          labs(x = "Year", y = "Assault rate (per 100,000 population)",
                caption = "Source: UNOCD Serious Assault Data")
           
             
@@ -432,8 +432,132 @@ shinyApp(ui, server, options = list(height = 500))
 
 The shiny app makes it possible to see trends in countries of certain regions and how they compare to each other. For example, it is clear that Hungary and Czech Republic have the highest rates of assault in the Eastern European regions. This type of observation can be made with a few other countries as well. Each region has a separate country that stands out.
 
-Even more, however, it is possible to see that there have not been many changes in rates over time. For example, the average rates as shown in \@ref(fig:bars) shows that the rates have not changed greatly over the years.
+Even more, however, it is possible to see that there have not been many changes in rates over time. For example, the average rates as shown in Figure \@ref(fig:robbery) shows that the rates have not changed greatly over the years.
 
-```{r}
+Robbery below... (still needs work)
 
+```{r robberyload}
+library(readxl)
+
+#2010
+robbery10 <- read_excel("robbery_0.xlsx") %>%
+  select(c("...1","...2","...3","2010...4","2010...5")) %>%
+  pivot_longer(!c("...1","...2","...3","2010...5"), names_to = "drop", values_to = "Count") %>%
+  mutate(Year = rep("2010", times=length(.$drop)))
+
+robbery10 = robbery10[,-5]
+
+colnames(robbery10) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
+
+robbery10 = robbery10[-1,]
+
+#2011
+robbery11 <- read_excel("robbery_0.xlsx") %>%
+  select(c("...1","...2","...3","2011...6","2011...7")) %>%
+  pivot_longer(!c("...1","...2","...3","2011...7"), names_to = "drop", values_to = "Count") %>%
+  mutate(Year = rep("2011", times=length(.$drop)))
+
+robbery11 = robbery11[,-5]
+
+colnames(robbery11) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
+
+robbery11 = robbery11[-1,]
+
+#2012
+robbery12 <- read_excel("robbery_0.xlsx") %>%
+  select(c("...1","...2","...3","2012...8","2012...9")) %>%
+  pivot_longer(!c("...1","...2","...3","2012...9"), names_to = "drop", values_to = "Count") %>%
+  mutate(Year = rep("2012", times=length(.$drop)))
+
+robbery12 = robbery12[,-5]
+
+colnames(robbery12) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
+
+robbery12 = robbery12[-1,]
+
+#2013
+robbery13 <- read_excel("robbery_0.xlsx") %>%
+  select(c("...1","...2","...3","2013...10","2013...11")) %>%
+  pivot_longer(!c("...1","...2","...3","2013...11"), names_to = "drop", values_to = "Count") %>%
+  mutate(Year = rep("2013", times=length(.$drop)))
+
+robbery13 = robbery13[,-5]
+
+colnames(robbery13) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
+
+robbery13 = robbery13[-1,]
+
+#2014
+robbery14 <- read_excel("robbery_0.xlsx") %>%
+  select(c("...1","...2","...3","2014...12","2014...13")) %>%
+  pivot_longer(!c("...1","...2","...3","2014...13"), names_to = "drop", values_to = "Count") %>%
+  mutate(Year = rep("2014", times=length(.$drop)))
+
+robbery14 = robbery14[,-5]
+
+colnames(robbery14) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
+
+robbery14 = robbery14[-1,]
+
+#2015
+robbery15 <- read_excel("robbery_0.xlsx") %>%
+  select(c("...1","...2","...3","2015...14","2015...15")) %>%
+  pivot_longer(!c("...1","...2","...3","2015...15"), names_to = "drop", values_to = "Count") %>%
+  mutate(Year = rep("2015", times=length(.$drop)))
+
+robbery15 = robbery15[,-5]
+
+colnames(robbery15) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
+
+robbery15 = robbery15[-1,]
+
+#2016
+robbery16 <- read_excel("robbery_0.xlsx") %>%
+  select(c("...1","...2","...3","2016...16","2016...17")) %>%
+  pivot_longer(!c("...1","...2","...3","2016...17"), names_to = "drop", values_to = "Count") %>%
+  mutate(Year = rep("2016", times=length(.$drop)))
+
+robbery16 = robbery16[,-5]
+
+colnames(robbery16) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
+
+robbery16 = robbery16[-1,]
+
+#2017
+robbery17 <- read_excel("robbery_0.xlsx") %>%
+  select(c("...1","...2","...3","2017...18","2017...19")) %>%
+  pivot_longer(!c("...1","...2","...3","2017...19"), names_to = "drop", values_to = "Count") %>%
+  mutate(Year = rep("2017", times=length(.$drop)))
+
+robbery17 = robbery17[,-5]
+
+colnames(robbery17) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
+
+robbery17 = robbery17[-1,]
+
+robbery <- robbery10 %>% bind_rows(robbery11) %>% bind_rows(robbery12) %>% bind_rows(robbery13) %>% bind_rows(robbery14) %>% bind_rows(robbery15) %>% bind_rows(robbery16) %>% bind_rows(robbery17)
+
+nasrob <- matrix(c(2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, sum(is.na(robbery10$Rate)), sum(is.na(robbery11$Rate)), sum(is.na(robbery12$Rate)), sum(is.na(robbery13$Rate)), sum(is.na(robbery14$Rate)), sum(is.na(robbery15$Rate)), sum(is.na(robbery16$Rate)), sum(is.na(robbery17$Rate))), ncol = 2, byrow = FALSE)
+
+colnames(nasrob) = c("Year", "NAs")
+
+rm(robbery10, robbery11, robbery12, robbery13, robbery14, robbery15, robbery16, robbery17)
+```
+
+```{r robbery}
+robbery %>%
+  group_by(Year, Region) %>%
+  summarise(
+    means = mean(as.numeric(Rate), na.rm = TRUE)
+  ) %>%
+  ggplot() +
+    geom_col(aes(x = Year, y = means, fill = Year)) +
+  theme_proj +
+  #scale_fill_viridis_d(option = "D") +
+  scale_fill_brewer(palette = "OrRd")+
+  guides(fill = FALSE) +
+  labs(x = "Year", y = "Mean Rate per 100,000 population",
+       title = "Mean Rate of Robbery per 100,000 population by Year",
+       caption = "Source: UNODC Serious Assault Data") +
+  facet_grid(. ~ Region)
 ```
