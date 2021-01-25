@@ -2,14 +2,13 @@
 title: "Final Project"
 author: "Tolga Atabas and Sherry Huang"
 date: "1/20/2021"
-output:
-  pdf_document:
-    fig_caption: yes
+output: bookdown::html_document2
 urlcolor: blue
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
 library(ggplot2)
 library(ggthemes)
 library(tidyverse)
@@ -19,17 +18,17 @@ library(plotly)
 library(readr)
 ```
 
-```{r plot themes, echo = FALSE, message = FALSE, warning = FALSE}
+```{r plot themes}
 theme_proj = theme_tufte() + 
   theme(plot.title.position = "plot")
 ```
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
+```{r}
 spotify <- read.csv("data.csv")
 spotify_by_year <- read.csv("data_by_year.csv")
 ```
 
-## Introduction
+# Introduction
 
 Music has an incredibly fascinating effect on people. Humans are one of the few, if not the only, animals that can naturally feel rhythms. When music is played, it only takes moments for people to clap along to the beat of the song. Specific genres and styles of music have defined generations and cultures time and time again. It’s only natural for music to be so powerful for people.
 
@@ -47,9 +46,10 @@ Other trends in music, and art in general, can illuminate these trends. Seeing t
 
 Change in music is not limited to different life periods, but is also present in different phases in one’s life. For example, there is a popular practice for pregnant mothers to play classical music for their babies in hopes of making them more intelligent. In other phases of life, teens may be warned to stay away from certain genres of music because it will “rot their brains” or act as a bad influence. In either case, music enters our lives early. Many young musical prodigies are discovered because they begin reacting to music even before they are able to speak or walk.
 
-Our plan for this study relies on a comprehensive data set supplied by the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). This data encompasses many interesting variables, and there is much to experiment with. It provides a fertile ground for exploration into how music affects humans. Two variables specifically are eye-catching: valence, a measure of the happiness of a song, and explicitness, whether a song contains explicit lyrics or not. There are also variables regarding year published, popularity, acousticness, etc. There is a perceived trend that current music (2010-2020) is becoming more and more explicit and despairing. In fact, this can be seen in Figure \ref{fig:scatvalyear} with a dip in valence after 1975. It may be possible to look at these different characteristics in acousticness, valence, and explicitness to create a model that predicts the popularity of music. 
+Our plan for this study relies on a comprehensive data set supplied by the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). This data encompasses many interesting variables, and there is much to experiment with. It provides a fertile ground for exploration into how music affects humans. Two variables specifically are eye-catching: valence, a measure of the happiness of a song, and explicitness, whether a song contains explicit lyrics or not. There are also variables regarding year published, popularity, acousticness, etc. There is a perceived trend that current music (2010-2020) is becoming more and more explicit and despairing. In fact, this can be seen in Figure \@ref(fig:scattervalyear) with a dip in valence after 1975. It may be possible to look at these different characteristics in acousticness, valence, and explicitness to create a model that predicts the popularity of music. 
 
-```{r scatter, echo=FALSE, fig.width=5,fig.height=3,fig.cap="\\label{fig:scatvalyear}Scatterplot of Spotify's valence score by year"}
+
+```{r scattervalyear,fig.width=5,fig.height=3,fig.cap="Scatterplot of Spotify's valence score by year"}
 
 ggplot(data = spotify_by_year) +
   geom_point(mapping = aes(x = year, y = valence)) +
@@ -63,11 +63,12 @@ ggplot(data = spotify_by_year) +
         panel.grid.minor = element_line(color = "gray90"))
 ```
 
+
 In addition to a study of trends in music consumption, this study aims to take a closer look at correlations between the music dataset and other datasets in mental health and crime. Is it possible that the prevalence in explicit music is rising with crime rates? Is it possible that the decrease in valence score is correlated with an increase in mental health cases? These questions will be discussed in the subsequent sections.
 
-## Data
+# Data
 
-Music:
+**Music:**
 The music dataset is made available through the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). Spotify is an audio streaming service that was launched in 2008 and is now one of the most popular streaming platforms for music and podcasts. Therefore, the dataset is fairly comprehensive and contains lots of  information due to Spotify’s status as one of the most popular sites for music consumption. 
 
 The data encompasses many interesting variables. Of course there are descriptors such as artist or band name, year of song, genre, and key, but there are many other metrics that require more attention.
@@ -76,7 +77,7 @@ These specially catered metrics usually range from 0 to 1. For example Spotify d
 
 Other metrics such as explicitness are described as follows: “Whether or not the episode has explicit content (true = yes it does; false = no it does not OR unknown)”. Whereas danceability is described as: “Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable”. 
 
-Crime:
+**Crime:**
 
 The United Nations Office on Drugs and Crime (UNODC) has many comprehensive datasets that pertain to crime of all different shapes and forms. The organization, as a subset of the United Nations works to cover pressing concerns related to crime, tackling crime, and preventing crime. The datasets present on their website are grouped in a manner that makes it easy to choose what to study. For example, the differentiation is made between sexual assault, homicide, and drug crimes. Further, homicide can be analyzed more specifically through the different mechanisms (firearm, sharp object, unkown, etc.)
 
@@ -88,7 +89,7 @@ Since all of these datasets were provided in separate files, it was necessary to
 
 The data also comes in a format that is not easy to work with, having a column of rate and count for each year (i.e. rate of crime, count of crime). The years available are from 2010 to 2017.
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
+```{r}
 library(readxl)
 
 #2010
@@ -99,7 +100,7 @@ assault10 <- read_excel("serious_assault_0.xlsx") %>%
 
 assault10 = assault10[,-5]
 
-colnames(assault10) = c("Region","Sub Region", "Country", "Rate", "Count", "Year") 
+colnames(assault10) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
 
 assault10 = assault10[-1,]
 
@@ -111,7 +112,7 @@ assault11 <- read_excel("serious_assault_0.xlsx") %>%
 
 assault11 = assault11[,-5]
 
-colnames(assault11) = c("Region","Sub Region", "Country", "Rate", "Count", "Year") 
+colnames(assault11) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
 
 assault11 = assault11[-1,]
 
@@ -123,7 +124,7 @@ assault12 <- read_excel("serious_assault_0.xlsx") %>%
 
 assault12 = assault12[,-5]
 
-colnames(assault12) = c("Region","Sub Region", "Country", "Rate", "Count", "Year") 
+colnames(assault12) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
 
 assault12 = assault12[-1,]
 
@@ -135,7 +136,7 @@ assault13 <- read_excel("serious_assault_0.xlsx") %>%
 
 assault13 = assault13[,-5]
 
-colnames(assault13) = c("Region","Sub Region", "Country", "Rate", "Count", "Year") 
+colnames(assault13) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
 
 assault13 = assault13[-1,]
 
@@ -147,7 +148,7 @@ assault14 <- read_excel("serious_assault_0.xlsx") %>%
 
 assault14 = assault14[,-5]
 
-colnames(assault14) = c("Region","Sub Region", "Country", "Rate", "Count", "Year") 
+colnames(assault14) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
 
 assault14 = assault14[-1,]
 
@@ -159,7 +160,7 @@ assault15 <- read_excel("serious_assault_0.xlsx") %>%
 
 assault15 = assault15[,-5]
 
-colnames(assault15) = c("Region","Sub Region", "Country", "Rate", "Count", "Year") 
+colnames(assault15) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
 
 assault15 = assault15[-1,]
 
@@ -171,7 +172,7 @@ assault16 <- read_excel("serious_assault_0.xlsx") %>%
 
 assault16 = assault16[,-5]
 
-colnames(assault16) = c("Region","Sub Region", "Country", "Rate", "Count", "Year") 
+colnames(assault16) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
 
 assault16 = assault16[-1,]
 
@@ -183,11 +184,15 @@ assault17 <- read_excel("serious_assault_0.xlsx") %>%
 
 assault17 = assault17[,-5]
 
-colnames(assault17) = c("Region","Sub Region", "Country", "Rate", "Count", "Year") 
+colnames(assault17) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
 
 assault17 = assault17[-1,]
 
 assault <- assault10 %>% bind_rows(assault11) %>% bind_rows(assault12) %>% bind_rows(assault13) %>% bind_rows(assault14) %>% bind_rows(assault15) %>% bind_rows(assault16) %>% bind_rows(assault17)
+
+nas <- matrix(c(2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, sum(is.na(assault10$Rate)), sum(is.na(assault11$Rate)), sum(is.na(assault12$Rate)), sum(is.na(assault13$Rate)), sum(is.na(assault14$Rate)), sum(is.na(assault15$Rate)), sum(is.na(assault16$Rate)), sum(is.na(assault17$Rate))), ncol = 2, byrow = FALSE)
+
+colnames(nas) = c("Year", "NAs")
 
 rm(assault10, assault11, assault12, assault13, assault14, assault15, assault16, assault17)
 ```
@@ -198,7 +203,7 @@ The data from UNODC will be in regards to
 + Robbery
 + Sexual Violence
 
-World Happiness:
+**World Happiness:**
 
 The first World Happiness Report was released on April 1, 2012 as a foundational text for the UN High Level Meeting: Well-being and Happiness: Defining a New Economic Paradigm, drawing international attention. The report outlined the state of world happiness, causes of happiness and misery, and policy implications highlighted by case studies. In 2013, the second World Happiness Report was issued, and since then has been issued on an annual basis with the exception of 2014. The report primarily uses data from the Gallup World Poll.
 
@@ -217,7 +222,7 @@ Data is collected from people in over 150 countries. Each variable measured reve
 
 Each country is also compared against a hypothetical nation called Dystopia. Dystopia represents the lowest national averages for each key variable and is, along with residual error, used as a regression benchmark. The six metrics are used to explain the estimated extent to which each of these factors contribute to increasing life satisfaction when compared to the hypothetical nation of Dystopia, but they themselves do not have an impact on the total score reported for each country
 
-```{r reading-happiness-datasets, echo = FALSE}
+```{r reading-happiness-datasets}
 # reading in world happiness datasets
 happiness_2015 <- read.csv("2015.csv") %>% mutate(year = 2015)
 happiness_2016 <- read.csv("2016.csv") %>% mutate(year = 2016)
@@ -269,11 +274,13 @@ happiness <- happiness_2015 %>% bind_rows(happiness_2016) %>% bind_rows(happines
 
 In the above code, I have changed the variable names in each dataset so they should all (mostly) match with each other. Then, I combined all the datasets into one big "happiness" dataset.
 
-## Exploration
+# Exploration
 
-There are some natural thoughts that may come up when thinking about what two characteristics in music may support each other, or on the other hand, go against each other. For example, one may think that acousticness and energy of a song are not necessarily compatible traits, however danceability and loudness may hold promise in a positive correlation. The pairs plot in Figure \ref{fig:gallyspotify} explores these relationships and correlations.
+## Spotify
 
-```{r gally, echo=FALSE, message = FALSE, warning = FALSE, fig.width=8,fig.height=8,fig.cap="\\label{fig:gallyspotify}Pairs plot for the variables in the Spotify dataset"}
+There are some natural thoughts that may come up when thinking about what two characteristics in music may support each other, or on the other hand, go against each other. For example, one may think that acousticness and energy of a song are not necessarily compatible traits, however danceability and loudness may hold promise in a positive correlation. The pairs plot in Figure \@ref(fig:gally) explores these relationships and correlations.
+
+```{r gally, fig.width=8,fig.height=8,fig.cap="Pairs plot for the variables in the Spotify dataset"}
 library(GGally)
 
 spotify_by_year %>%
@@ -282,9 +289,13 @@ spotify_by_year %>%
 
 ```
 
-Before we begin combining the Spotify dataset with other datasets, it's important to look at those datasets individually. For example, how does the World Happiness dataset change over each year? The world map below, in Figure \ref{fig:plotlyhappiness}, is an interactive map that displays the change in world happiness in countries over the years from $2015$ to $2020$. (Hover over countries to see more specific information.)
+By looking at the pairs plot, it is possible to see that acousticness and energy are inversely related, and pretty strong at that (refer to plot with \@ref(fig:gally), r = -0.967***). There are many other relationships to explore later when building a model. However, another promising relationships is between the loudness and popularity parameters. The songs that are louder also have a tendancy to be more popular.
 
-```{r, echo = FALSE, fig.cap="\\label{fig:plotlyhappiness}Map of World Happiness from 2015 - 2020"}
+## Happiness
+
+Before we begin combining the Spotify dataset with other datasets, it's important to look at those datasets individually. For example, how does the World Happiness dataset change over each year? The world map below, in Figure \@ref(fig:plotlyhappiness), is an interactive map that displays the change in world happiness in countries over the years from $2015$ to $2020$. (Hover over countries to see more specific information.)
+
+```{r plotlyhappiness, fig.cap="Map of World Happiness from 2015 - 2020"}
 #loading dataset of each country's ISO code (because plotly needs it to map countries)
 country_code <- read_csv("wikipedia-iso-country-codes.csv")
 
@@ -329,3 +340,100 @@ p1 <- plot_geo(happiness_plotly, locationmode = "world", frame = ~year) %>%
 p1
 ```
 
+## Crime
+
+Continuing with the exploration, it is time to look at the crime data. The crime data comes from the United Nations Office on Drugs and Crime and depends on reportings from each country. This can create a discrepancy because each country has different considerations and guidelines on crime which will dictate if a specific incident enters their records or not.
+
+Withstanding these limitations, it is still beneficial to look at what is made available at hand. The shiny app allows the viewing of country assault rates, filtered by regions.
+
+```{r shiny}
+library(shiny)
+
+regions = assault$Region
+
+ui <- fluidPage(
+    
+    # Application title
+    titlePanel("Looking at Rate by Region (make a selection)"),
+    
+    # Sidebar layout with a input and output definitions
+    sidebarLayout(
+        # Inputs: Select variables to plot
+        sidebarPanel(
+            
+            # Select variable for location
+            selectInput(inputId = "region", 
+                        label = "Region:",
+                        choices = regions, 
+                        selected = "Americas",
+                        multiple = FALSE),
+            
+            uiOutput("sub")
+        ),
+        
+        #Output
+        
+        mainPanel(
+            
+            # Show plot
+            plotlyOutput(outputId = "plot"),
+            br(),        # a little bit of visual separation
+            
+        )
+    )
+)
+
+# Define server function --------------------------------------------
+server <- function(input, output) {
+    
+    output$sub <- renderUI({
+        this_region <- assault %>%
+            filter(Region == input$region)
+        sub_this_location <- sort(unique(this_region$Subregion))
+        
+        selectInput(inputId = "sub", label = "Sub Region:", choices = sub_this_location, selected = "Northern America")
+    })
+    
+    # Creates plot object the plotOutput function is expecting
+    output$plot <- renderPlotly({
+        
+        #Creates base plot 
+        
+        Region_of_Interest = input$region
+        Sub_of_Interest = input$sub
+        
+        plot_data <- assault %>% 
+            filter(Region == Region_of_Interest) %>%
+            filter(Subregion == Sub_of_Interest) 
+            
+            p3 <- ggplot(data = plot_data) + 
+          geom_jitter(aes(x = Year, y = as.numeric(Rate), 
+                          color = Country, text = Country), 
+                      size = 3, alpha = 0.8, width = 0.3) +
+          theme_proj +
+          #need to add gridlines because tufte removes them
+          theme(panel.grid.major = element_line(color = "gray90"),
+                panel.grid.minor = element_line(color = "gray90"),
+                legend.position = "none") +
+          labs(x = "Year", y = "Assault rate (per 100,000 population",
+               caption = "Source: UNOCD Serious Assault Data")
+          
+            
+        
+        ggplotly(p3, tooltip = "text")
+    })
+    
+    
+}
+
+# Create the Shiny app object ---------------------------------------
+shinyApp(ui, server, options = list(height = 500))
+```
+
+The shiny app makes it possible to see trends in countries of certain regions and how they compare to each other. For example, it is clear that Hungary and Czech Republic have the highest rates of assault in the Eastern European regions. This type of observation can be made with a few other countries as well. Each region has a separate country that stands out.
+
+Even more, however, it is possible to see that there have not been many changes in rates over time. For example, the average rates as shown in \@ref(fig:bars) shows that the rates have not changed greatly over the years.
+
+```{r}
+
+```
