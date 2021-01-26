@@ -1,0 +1,85 @@
+---
+title: "Name of your report"
+author: |
+  | Your name
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      countIncrementalSlides: false
+---
+
+# Xaringan presentation
+
+(Need to install the `xaringan` package)
+
++ [About](https://bookdown.org/yihui/rmarkdown/xaringan.html)
++ [Themes here](https://github.com/yihui/xaringan/wiki/Themes)
++ Want to get fancy with a custom theme? Try [xaringan themer](https://pkg.garrickadenbuie.com/xaringanthemer/articles/xaringanthemer.html)
++ Style edits: google "how to ______ in xaringan"
+
+**Difference:** slides are broken up with `---`
+
+---
+# Including an image
+
+
+```{r, echo = FALSE, out.width = '100%'}
+knitr::include_graphics("images/lter_penguins.png")
+```
+
+---
+# Bullets
+
+* **Bold** 
+* *Italic* 
++ Can also use `+` instead of `*` to create the bullets 
+    + use a double `tab` to get subbullets 
+
+---
+# Latex 
+
+You can embed latex right into your slides, for example:
+
+* Unweighted graph: $A_{i,j} \in \{0,1\}$ where 1 means there is an edge between nodes $i$ and $j$, and 0 means no edge.
+* Weighted graph: perhaps $A_{i,j} \in [0,1]$  or $A_{i,j} \in [0,\infty)$ 
+* Undirected graph: $A_{i,j} = A_{j,i}$. Directed graph: possible that $A_{i,j} \neq A_{j,i}$.
+
+---
+# R code
+
+```{r, echo=TRUE, fig.height=2, fig.width=2.5, fig.align='center'}
+library(tidyverse)
+library(tidymodels)
+library(palmerpenguins)
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, col = species)) + 
+  geom_point(alpha = .7) + 
+  theme_minimal(base_family = "serif") + # Custom fonts can be tricky with latex
+  scale_color_viridis_d(option = "C", end = .75)
+```
+
+---
+# Tables by hand
+
+| Variable  | Description | 
+| --------  |-------------------------------------------------| 
+| species                 | species of penguin   |
+| island                  | island where penguin lives |
+| bill_length_mm          | bill length in mm |
+| bill_depth_mm           | bill depth in mm |
+| flipper_length_mm       | flipper length in mm |
+
+([tablesgenerator.com](https://www.tablesgenerator.com) is great for making markdown tables)
+
+---
+# Tables with R output
+
+```{r}
+bill_mod = lm(bill_length_mm ~ bill_depth_mm + species, 
+              data = penguins)
+tidy(bill_mod) %>% 
+  kableExtra::kable()
+```
+
