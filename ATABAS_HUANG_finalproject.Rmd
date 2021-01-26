@@ -153,7 +153,7 @@ happiness_plotly <- left_join(country_code, happiness, by = c("English short nam
 
 #renaming the happiness dataset variables
 colnames(happiness_plotly) = c("Country", "two.code", "three.code", "Numeric.code", "ISO",
-                        "Region", "Happiness.Rank", "Happiness.Score", "Standard.Error",
+                        "X", "Region", "Happiness.Rank", "Happiness.Score", "Standard.Error",
                         "Economy..GDP.per.Capita.", "Family", "Health..Life.Expectancy.",
                         "Freedom", "Trust..Government.Corruption.", "Generosity",
                         "Dystopia.Residual", "year", "mean", "Lower.Confidence.Interval",
@@ -331,7 +331,7 @@ p1 <- assault %>%
   ggplot() +
     geom_col(aes(x = Year, y = means, fill = Year)) +
   theme_proj +
-  scale_fill_brewer(palette = "YlOrRd")+
+  scale_fill_brewer(palette = "YlOrRd") +
   guides(fill = FALSE) +
   labs(x = "Year", y = "Mean Rate per 100,000 population",
        title = "Mean Rate of Assault per 100,000 population by Year",
@@ -348,7 +348,7 @@ p2 <- robbery %>%
   ggplot() +
     geom_col(aes(x = Year, y = means, fill = Year)) +
   theme_proj +
-  scale_fill_brewer(palette = "YlOrRd")+
+  scale_fill_brewer(palette = "YlOrRd") +
   guides(fill = FALSE) +
   labs(x = "Year", y = "Mean Rate per 100,000 population",
        title = "Mean Rate of Robbery per 100,000 population by Year",
