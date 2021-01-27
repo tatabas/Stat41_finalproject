@@ -77,7 +77,7 @@ Music has strong effects on the brain, specifically on: memory, movement, and em
 ---
 # Exploring Spotify Dataset
 
-```{r scatter, echo=FALSE, message = FALSE, warning = FALSE, dpi = 200}
+```{r scatter, echo=FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
 library(ggplot2)
 library(ggthemes)
 library(tidyverse)
@@ -101,25 +101,8 @@ ggplot(data = spotify_by_year) +
         panel.grid.minor = element_line(color = "gray90"))
 ```
 
-```{r eda-2, echo = FALSE, message = FALSE, warning = FALSE, dpi = 200}
-data <- read.csv("data/data.csv")
-
-data %>%
-  mutate(explicit = ifelse(explicit == 0, "Not Explicit", "Explicit")) %>%
-  ggplot(aes(x = danceability, y = explicit)) +
-  geom_density_ridges(aes(fill = explicit, group = explicit), alpha = 0.7) +
-  labs(title = "Danceability of a song and whether it is explicit or not",
-       subtitle = "(danceability is a measure from 0 to 1)",
-       y = element_blank(),
-       x = "Danceability") +
-  scale_fill_manual(values = c( "#ffbebd","#1a405F")) +
-  scale_y_discrete(limits = c("Not Explicit", "Explicit")) +
-  theme_proj +
-  guides(fill = FALSE)
-```
-
 ---
-# Exploring World Happiness Dataset
+# Exploring Happiness Dataset
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 #loading dataset of each country's ISO code (because plotly needs it to map countries)
@@ -217,8 +200,10 @@ p1
 # credit to this tutorial: https://www.youtube.com/watch?v=RrtqBYLf404
 ```
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 5, dpi = 200}
-ggplot(happiness, aes(y = Region, x = Happiness.Score, fill = Region)) + 
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
+library(patchwork)
+#happiness_ridges <- happiness %>% filter(year == 2015 | year == 2016 | year == 2020)
+plot0 <- ggplot(happiness_2015, aes(y = Region, x = Happiness.Score, fill = Region)) + 
   geom_density_ridges(alpha = .8) +
   scale_fill_viridis_d(end = .75, option = "C") + 
   scale_color_viridis_d(end = .75, option = "C") + 
@@ -228,6 +213,30 @@ ggplot(happiness, aes(y = Region, x = Happiness.Score, fill = Region)) +
        x = "Happiness Score",
        y = "Region",
        caption = "SOURCE: World Happiness Report")
+
+plot1 <- ggplot(happiness_2016, aes(y = Region, x = Happiness.Score, fill = Region)) +
+  geom_density_ridges(alpha = .8) +
+  scale_fill_viridis_d(end = .75, option = "C") +
+  scale_color_viridis_d(end = .75, option = "C") +
+  theme_proj +
+  theme(legend.position = "none") +
+  labs(title = "Happiness Score of Each Region",
+       x = "Happiness Score",
+       y = "Region",
+       caption = "SOURCE: World Happiness Report")
+
+plot2 <- ggplot(happiness_2020, aes(y = Region, x = Happiness.Score, fill = Region)) +
+  geom_density_ridges(alpha = .8) +
+  scale_fill_viridis_d(end = .75, option = "C") +
+  scale_color_viridis_d(end = .75, option = "C") +
+  theme_proj +
+  theme(legend.position = "none") +
+  labs(title = "Happiness Score of Each Region",
+       x = "Happiness Score",
+       y = "Region",
+       caption = "SOURCE: World Happiness Report")
+
+plot0 + plot1 + plot2
 ```
 
 ---
@@ -238,7 +247,7 @@ ggplot(happiness, aes(y = Region, x = Happiness.Score, fill = Region)) +
 ---
 # Crime & Happiness Over Time
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 5, dpi = 200}
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
 ggplot(data = happiness) +
   geom_point(mapping = aes(x = year, y = mean)) +
   geom_line(mapping = aes(x = year, y = mean)) +
@@ -258,7 +267,7 @@ ggplot(data = happiness) +
 ---
 # Comparisons
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 4, fig.width = 5, dpi = 200}
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
 spotify_by_year_small <- spotify_by_year %>% filter(year == 2015 | year == 2016 | year == 2017 | year == 2018 | year == 2019 | year == 2020)
 
 spotify_and_happiness <- left_join(spotify_by_year_small, happiness, by = c("year" = "year"))
