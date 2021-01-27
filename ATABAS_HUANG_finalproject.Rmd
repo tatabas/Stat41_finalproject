@@ -30,6 +30,7 @@ spotify_by_year <- read.csv("data/data_by_year.csv")
 happiness <- read.csv("data/happiness.csv")
 robbery <- read.csv("data/robbery.csv")
 assault <- read.csv("data/assault.csv")
+sexualviolence <- read.csv("data/sexualviolence.csv")
 ```
 
 # Introduction
@@ -134,10 +135,101 @@ library(GGally)
 spotify_by_year %>%
   select(valence, acousticness, danceability, duration_ms, energy, instrumentalness, liveness, loudness, popularity, speechiness) %>%
   GGally::ggpairs()
-
 ```
 
 By looking at the pairs plot, it is possible to see that acousticness and energy are inversely related, and pretty strong at that (refer to plot with \@ref(fig:gally), r = -0.967***). There are many other relationships to explore later when building a model. However, another promising relationships is between the loudness and popularity parameters. The songs that are louder also have a tendancy to be more popular.
+
+```{r shiny-ggally}
+library(shiny)
+
+ui <- fluidPage(
+    
+    # Application title
+    titlePanel("Looking at Music Trends (make a selection)"),
+    
+    # Sidebar layout with a input and output definitions
+    sidebarLayout(
+        # Inputs: Select variables to plot
+        sidebarPanel(
+            
+            # Select variable for location
+            selectInput(inputId = "x", 
+                        label = "X Axis: ",
+                        choices = c("Valence" = "valence", "Acousticness" = "acousticness",
+                                    "Danceability" = "danceability", "Duration" = "duration_ms", 
+                                    "Energy" = "energy", "Instrumentalness" = "instrumentalness",
+                                    "Liveness" = "liveness", "Loudness" = "loudness", 
+                                    "Popularity" = "popularity", "Speechiness" = "speechiness"),
+                        selected = "acousticness",
+                        multiple = FALSE),
+            
+            selectInput(inputId = "y",
+                        label = "Y Axis: ",
+                        choices = c("Valence" = "valence", "Acousticness" = "acousticness",
+                                    "Danceability" = "danceability", "Duration" = "duration_ms", 
+                                    "Energy" = "energy", "Instrumentalness" = "instrumentalness",
+                                    "Liveness" = "liveness", "Loudness" = "loudness", 
+                                    "Popularity" = "popularity", "Speechiness" = "speechiness"),
+                        selected = "energy",
+                        multiple = FALSE),
+            
+            checkboxInput(inputId = "mod",
+                          label = "Line",
+                          value = TRUE)
+        ),
+        
+        #Output
+        
+        mainPanel(
+            
+            # Show plot
+            plotlyOutput(outputId = "plot"),
+            br(),        # a little bit of visual separation
+            
+        )
+    )
+)
+
+# Define server function --------------------------------------------
+server <- function(input, output) {
+    
+    output$plot <- renderPlotly({
+            
+   p3 <- 
+     spotify_by_year %>%
+     mutate(
+       constant = 0.02
+     ) %>%
+     ggplot(aes_string(x = input$x, y = input$y)) +
+     geom_point(aes(text = paste("Year:",year))) +
+     theme_proj +
+          #need to add gridlines because tufte removes them
+          theme(panel.grid.major = element_line(color = "gray90"),
+                panel.grid.minor = element_line(color = "gray90"),
+                legend.position = "none") +
+          labs(x = input$x, y = input$y,
+               caption = "Source: Spotify API") +
+       if(input$mod) {geom_smooth(method = "lm", se = FALSE)}
+   
+   
+    ggplotly(p3, tooltip = "text")
+    })
+}
+
+# Create the Shiny app object ---------------------------------------
+shinyApp(ui, server, options = list(height = 500))
+```
+
+```{r}
+  ggplot(data = spotify_by_year,aes(x = acousticness, y = valence)) + 
+              geom_point()+
+          theme_proj +
+          #need to add gridlines because tufte removes them
+          theme(panel.grid.major = element_line(color = "gray90"),
+                panel.grid.minor = element_line(color = "gray90"),
+                legend.position = "none") 
+          
+```
 
 ## Happiness
 
@@ -249,7 +341,7 @@ ui <- fluidPage(
             selectInput(inputId = "region", 
                         label = "Region:",
                         choices = regions, 
-                        selected = "Americas",
+                        selected = "Africa",
                         multiple = FALSE),
             
             uiOutput("sub")
@@ -275,7 +367,7 @@ server <- function(input, output) {
             filter(Region == input$region)
         sub_this_location <- sort(unique(this_region$Subregion))
         
-        selectInput(inputId = "sub", label = "Sub Region:", choices = sub_this_location, selected = "Northern America")
+        selectInput(inputId = "sub", label = "Sub Region:", choices = sub_this_location, selected = "Eastern Africa")
     })
     
     # Creates plot object the plotOutput function is expecting
@@ -290,10 +382,11 @@ server <- function(input, output) {
             filter(Region == Region_of_Interest) %>%
             filter(Subregion == Sub_of_Interest) 
             
-            p3 <- ggplot(data = plot_data) + 
-          geom_jitter(aes(x = Year, y = as.numeric(Rate), 
-                          color = Country, text = Country), 
-                      size = 3, alpha = 0.8, width = 0.3) +
+            p3 <- ggplot(data = plot_data,aes(x = Year, y = as.numeric(Rate), 
+                          color = Country)) + 
+              geom_line(aes(text = Country)) +
+              geom_point(aes(text = Country), 
+                      size = 3, alpha = 0.8) +
           theme_proj +
           #need to add gridlines because tufte removes them
           theme(panel.grid.major = element_line(color = "gray90"),
@@ -316,6 +409,8 @@ shinyApp(ui, server, options = list(height = 500))
 
 The shiny app makes it possible to see trends in countries of certain regions and how they compare to each other. For example, it is clear that Hungary and Czech Republic have the highest rates of assault in the Eastern European regions. This type of observation can be made with a few other countries as well. Each region has a separate country that stands out.
 
+Also, the lines through the points show that not all countries have data for every year. This can be a limitation, however, the methods used later will make use of the general trends and not data per country.
+
 Even more, however, it is possible to see that there have not been many changes in rates over time. For example, the average rates as shown in Figure \@ref(fig:robbery) shows that the rates have not changed greatly over the years.
 
 Robbery below... (still needs work)
@@ -329,15 +424,15 @@ p1 <- assault %>%
     means = mean(as.numeric(Rate), na.rm = TRUE)
   ) %>%
   ggplot() +
-    geom_col(aes(x = Year, y = means, fill = Year)) +
+    geom_col(aes(x = Year, y = means, fill = means)) +
   theme_proj +
-  scale_fill_brewer(palette = "YlOrRd") +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1) +
   guides(fill = FALSE) +
   labs(x = "Year", y = "Mean Rate per 100,000 population",
        title = "Mean Rate of Assault per 100,000 population by Year",
        caption = "Source: UNODC Serious Assault Data") +
   theme(plot.title = element_text(size = 8)) +
-  theme(axis.text.x = element_text(angle = 90, vjust = .1, hjust=.1)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = .1, hjust=.1)) +
   facet_grid(. ~ Region)
 
 p2 <- robbery %>%
@@ -346,18 +441,35 @@ p2 <- robbery %>%
     means = mean(as.numeric(Rate), na.rm = TRUE)
   ) %>%
   ggplot() +
-    geom_col(aes(x = Year, y = means, fill = Year)) +
+    geom_col(aes(x = Year, y = means, fill = means)) +
   theme_proj +
-  scale_fill_brewer(palette = "YlOrRd") +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1) +
   guides(fill = FALSE) +
-  labs(x = "Year", y = "Mean Rate per 100,000 population",
+  labs(x = "Year", y = element_blank(),
        title = "Mean Rate of Robbery per 100,000 population by Year",
        caption = "Source: UNODC Robbery Crime Data") +
   theme(plot.title = element_text(size = 8)) +
-  theme(axis.text.x = element_text(angle = 90, vjust = .1, hjust=.1)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = .1, hjust=.1)) +
   facet_grid(. ~ Region)
 
-p1 + p2
+p3 <- sexualviolence %>%
+  group_by(Year, Region) %>%
+  summarise(
+    means = mean(as.numeric(Rate), na.rm = TRUE)
+  ) %>%
+  ggplot() +
+    geom_col(aes(x = Year, y = means, fill = means)) +
+  theme_proj +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1) +
+  guides(fill = FALSE) +
+  labs(x = "Year", y = element_blank(),
+       title = "Mean Rate of Sexual Violence per 100,000 population by Year",
+       caption = "Source: UNODC Sexual Violence Data") +
+  theme(plot.title = element_text(size = 8), 
+        axis.text.x = element_text(angle = 45, vjust = .1, hjust=.1)) +
+  facet_grid(. ~ Region)
+
+p1 + p2 + p3
 ```
 
 # Comparing Datasets/Variables
@@ -397,7 +509,71 @@ summary(spotify_happiness_lm)
 
 ## Crime and Explicitness
 
-(Here, we plan on exploring the changes in crime over the years and how they correspond to changes in explicitness of songs over time.)
+```{r}
+comparing_assault <- spotify %>%
+  filter(year >= 2010 & year <= 2017) %>%
+  inner_join(., assault, by = c("year" = "Year")) %>%
+  mutate(
+    type = "Assault"
+  )
+
+comparing_robbery <- spotify %>%
+  filter(year >= 2010 & year <= 2017) %>%
+  inner_join(., robbery, by = c("year" = "Year")) %>%
+  mutate(
+    type = "Robbery"
+  )
+
+comparing_sexualviolence <- spotify %>%
+  filter(year >= 2010 & year <= 2017) %>%
+  inner_join(., sexualviolence, by = c("year" = "Year")) %>%
+  mutate(
+    type = "Sexual Violence"
+  )
+
+all_together <- comparing_assault %>% bind_rows(comparing_robbery) %>% bind_rows(comparing_sexualviolence)
+```
+
+```{r crimeandexplicitness, fig.width = 9, fig.height= 3, fig.cap = "Logistic regression on rates of crime and explicitness of songs by region for the years 2010 - 2017"}
+c1 <- ggplot(data = comparing_assault, aes(x = Rate, y = explicit)) +
+  geom_jitter(width = 0.3, height = 0.05, alpha = 0.3, size = 0.05) +
+  geom_smooth(
+    method = "glm", method.args = list(family = "binomial"), 
+    color = "dodgerblue", se = FALSE
+  ) +
+  facet_grid(. ~ Region, scale = "free_x") +
+  theme_proj
+
+c2 <- ggplot(data = comparing_robbery, aes(x = Rate, y = explicit)) +
+  geom_jitter(width = 0.3, height = 0.1, alpha = 0.3, size = 0.05) +
+  geom_smooth(
+    method = "glm", method.args = list(family = "binomial"), 
+    color = "dodgerblue", se = FALSE
+  ) +
+  facet_grid(. ~ Region, scale = "free_x")+
+  theme_proj
+
+c3 <- ggplot(data = comparing_sexualviolence, aes(x = Rate, y = explicit)) +
+  geom_jitter(width = 0.3, height = 0.05, alpha = 0.3, size = 0.05) +
+  geom_smooth(
+    method = "glm", method.args = list(family = "binomial"), 
+    color = "dodgerblue", se = FALSE
+  ) +
+  facet_grid(. ~ Region, scale = "free_x") +
+  theme_proj
+
+c1 + c2 + c3
+```
+```{r}
+ggplot(data = all_together, aes(x = Rate, y = explicit)) +
+  geom_jitter(width = 0.3, height = 0.05, alpha = 0, size = 0.05) +
+  geom_smooth(
+    method = "glm", method.args = list(family = "binomial"), 
+    color = "dodgerblue", se = FALSE, size = 1
+  ) +
+  facet_grid(type ~ Region, scale = "free_x") +
+  theme_proj
+```
 
 # Predicting the Next Popular Song!
 

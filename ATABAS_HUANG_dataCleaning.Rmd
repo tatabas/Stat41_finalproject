@@ -295,3 +295,110 @@ rm(robbery10, robbery11, robbery12, robbery13, robbery14, robbery15, robbery16, 
 
 write.csv(robbery, "data/robbery.csv")
 ```
+
+
+```{r sexualviolence}
+library(readxl)
+
+#2010
+sexualviolence10 <- read_excel("data/sexual_violence_0.xlsx") %>%
+  select(c("...1","...2","...3","2010...18","2010...19")) %>%
+  pivot_longer(!c("...1","...2","...3","2010...19"), names_to = "drop", values_to = "Count") %>%
+  mutate(Year = rep("2010", times=length(.$drop)))
+
+sexualviolence10 = sexualviolence10[,-5]
+
+colnames(sexualviolence10) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
+
+sexualviolence10 = sexualviolence10[-1,]
+
+#2011
+sexualviolence11 <- read_excel("data/sexual_violence_0.xlsx") %>%
+  select(c("...1","...2","...3","2011...20","2011...21")) %>%
+  pivot_longer(!c("...1","...2","...3","2011...21"), names_to = "drop", values_to = "Count") %>%
+  mutate(Year = rep("2011", times=length(.$drop)))
+
+sexualviolence11 = sexualviolence11[,-5]
+
+colnames(sexualviolence11) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
+
+sexualviolence11 = sexualviolence11[-1,]
+
+#2012
+sexualviolence12 <- read_excel("data/sexual_violence_0.xlsx") %>%
+  select(c("...1","...2","...3","2012...22","2012...23")) %>%
+  pivot_longer(!c("...1","...2","...3","2012...23"), names_to = "drop", values_to = "Count") %>%
+  mutate(Year = rep("2012", times=length(.$drop)))
+
+sexualviolence12 = sexualviolence12[,-5]
+
+colnames(sexualviolence12) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
+
+sexualviolence12 = sexualviolence12[-1,]
+
+#2013
+sexualviolence13 <- read_excel("data/sexual_violence_0.xlsx") %>%
+  select(c("...1","...2","...3","2013...24","2013...25")) %>%
+  pivot_longer(!c("...1","...2","...3","2013...25"), names_to = "drop", values_to = "Count") %>%
+  mutate(Year = rep("2013", times=length(.$drop)))
+
+sexualviolence13 = sexualviolence13[,-5]
+
+colnames(sexualviolence13) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
+
+sexualviolence13 = sexualviolence13[-1,]
+
+#2014
+sexualviolence14 <- read_excel("data/sexual_violence_0.xlsx") %>%
+  select(c("...1","...2","...3","2014...26","2014...27")) %>%
+  pivot_longer(!c("...1","...2","...3","2014...27"), names_to = "drop", values_to = "Count") %>%
+  mutate(Year = rep("2014", times=length(.$drop)))
+
+sexualviolence14 = sexualviolence14[,-5]
+
+colnames(sexualviolence14) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
+
+sexualviolence14 = sexualviolence14[-1,]
+
+#2015
+sexualviolence15 <- read_excel("data/sexual_violence_0.xlsx") %>%
+  select(c("...1","...2","...3","2015...28","2015...29")) %>%
+  pivot_longer(!c("...1","...2","...3","2015...29"), names_to = "drop", values_to = "Count") %>%
+  mutate(Year = rep("2015", times=length(.$drop)))
+
+sexualviolence15 = sexualviolence15[,-5]
+
+colnames(sexualviolence15) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
+
+sexualviolence15 = sexualviolence15[-1,]
+
+#2016
+sexualviolence16 <- read_excel("data/sexual_violence_0.xlsx") %>%
+  select(c("...1","...2","...3","2016...30","2016...31")) %>%
+  pivot_longer(!c("...1","...2","...3","2016...31"), names_to = "drop", values_to = "Count") %>%
+  mutate(Year = rep("2016", times=length(.$drop)))
+
+sexualviolence16 = sexualviolence16[,-5]
+
+colnames(sexualviolence16) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
+
+sexualviolence16 = sexualviolence16[-1,]
+
+#2017
+sexualviolence17 <- read_excel("data/sexual_violence_0.xlsx") %>%
+  select(c("...1","...2","...3","2017...32","2017...33")) %>%
+  pivot_longer(!c("...1","...2","...3","2017...33"), names_to = "drop", values_to = "Count") %>%
+  mutate(Year = rep("2017", times=length(.$drop)))
+
+sexualviolence17 = sexualviolence17[,-5]
+
+colnames(sexualviolence17) = c("Region","Subregion", "Country", "Rate", "Count", "Year") 
+
+sexualviolence17 = sexualviolence17[-1,]
+
+assault <- sexualviolence10 %>% bind_rows(sexualviolence11) %>% bind_rows(sexualviolence12) %>% bind_rows(sexualviolence13) %>% bind_rows(sexualviolence14) %>% bind_rows(sexualviolence15) %>% bind_rows(sexualviolence16) %>% bind_rows(sexualviolence17)
+
+rm(sexualviolence10, sexualviolence11, sexualviolence12, sexualviolence13, sexualviolence14, sexualviolence15, sexualviolence16, sexualviolence17)
+
+write.csv(assault, "data/sexualviolence.csv")
+```
