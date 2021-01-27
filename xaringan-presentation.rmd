@@ -1,9 +1,10 @@
 ---
-title: "Name of your report"
+title: "Music, Crime, and Happiness"
 author: |
-  | Your name
+  | Tolga Atabas & Sherry Huang
 output:
   xaringan::moon_reader:
+    css: stat41-lab-theme.css
     lib_dir: libs
     nature:
       highlightStyle: github
@@ -22,64 +23,264 @@ output:
 **Difference:** slides are broken up with `---`
 
 ---
-# Including an image
+# Introduction
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/rnUSNbqtVJI" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-```{r, echo = FALSE, out.width = '100%'}
-knitr::include_graphics("images/lter_penguins.png")
-```
-
----
-# Bullets
-
-* **Bold** 
-* *Italic* 
-+ Can also use `+` instead of `*` to create the bullets 
-    + use a double `tab` to get subbullets 
+Music has strong effects on the brain, specifically on: memory, movement, and emotions. Is it possible to see trends between music and happiness, and music and crime?
 
 ---
-# Latex 
+# Music Dataset
 
-You can embed latex right into your slides, for example:
-
-* Unweighted graph: $A_{i,j} \in \{0,1\}$ where 1 means there is an edge between nodes $i$ and $j$, and 0 means no edge.
-* Weighted graph: perhaps $A_{i,j} \in [0,1]$  or $A_{i,j} \in [0,\infty)$ 
-* Undirected graph: $A_{i,j} = A_{j,i}$. Directed graph: possible that $A_{i,j} \neq A_{j,i}$.
-
----
-# R code
-
-```{r, echo=TRUE, fig.height=2, fig.width=2.5, fig.align='center'}
-library(tidyverse)
-library(tidymodels)
-library(palmerpenguins)
-penguins %>%
-  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, col = species)) + 
-  geom_point(alpha = .7) + 
-  theme_minimal(base_family = "serif") + # Custom fonts can be tricky with latex
-  scale_color_viridis_d(option = "C", end = .75)
-```
+| Variable         | Type | Description                                                         | Example    |
+|------------------|------|---------------------------------------------------------------------|------------|
+| mode             | int  | whether progression of track is major (1) or minor (0)              | 1          |
+| year             | int  | the year                                                            | 2020       |
+| acousticness     | num  | relative metric of track being acoustic                             | 0.2199309  |
+| danceability     | num  | relative measurement of track being danceable                       | 0.6929043  |
+| duration_ms      | num  | length of track in milliseconds                                     | 193728.4   |
+| energy           | num  | energy of track                                                     | 0.6312316  |
+| instrumentalness | num  | relative ratio of track being instrumental                          | 0.01637552 |
+| liveness         | num  | relative duration of track sounding as a live performance           | 0.1785354  |
+| loudness         | num  | relative loudness of track in the typical range [-60, 0] in decibel | -6.595067  |
+| speechiness      | num  | relative length of track containing any kind of human voice         | 0.14138369 |
+| tempo            | num  | overall estimated tempo of a track in beats per minute              | 124.2831   |
+| valence          | num  | describes the musical positiveness conveyed by a track              | 0.5010478  |
+| popularity       | num  | popularity                                                          | 64.3019704 |
+| key              | int  | key track is in                                                     | 1          |
 
 ---
-# Tables by hand
+# World Happiness Dataset
 
-| Variable  | Description | 
-| --------  |-------------------------------------------------| 
-| species                 | species of penguin   |
-| island                  | island where penguin lives |
-| bill_length_mm          | bill length in mm |
-| bill_depth_mm           | bill depth in mm |
-| flipper_length_mm       | flipper length in mm |
+| Variable                      | Type | Description                                                                                            | Example        |
+|-------------------------------|------|--------------------------------------------------------------------------------------------------------|----------------|
+| Country                       | chr  | country                                                                                                | Switzerland    |
+| Region                        | chr  | region country is located in                                                                           | Western Europe |
+| Happiness.Rank                | int  | ranking by happiness score                                                                             | 1              |
+| Happiness.Score               | num  | happiness score [0, 10]                                                                                | 7.587          |
+| Standard.Error                | num  | standard error of happiness score                                                                      | 0.03411        |
+| Economy..GDP.per.Capita.      | num  | is in terms of Purchasing Power Parity                                                                 | 1.39651        |
+| Family                        | num  | family and social support                                                                              | 1.34951        |
+| Health..Life.Expectancy.      | num  | healthy life expectancy at birth                                                                       | 0.94143        |
+| Freedom                       | num  | freedom to make life choices                                                                           | 0.66557        |
+| Trust..Government.Corruption. | num  | perceptions of corruption                                                                              | 0.41978        |
+| Generosity                    | num  | generosity of people in the country                                                                    | 0.29678        |
+| Dystopia.Residual             | num  | relative to a hypothetical country called “Dystopia” (with lowest national averages of previous years) | 2.51738        |
+| year                          | int  | year                                                                                                   | 2015           |
+| mean                          | num  | average happiness score                                                                                | 5.375734       |
+
+---
+# Crime Dataset
 
 ([tablesgenerator.com](https://www.tablesgenerator.com) is great for making markdown tables)
 
 ---
-# Tables with R output
+# Exploring Spotify Dataset
 
-```{r}
-bill_mod = lm(bill_length_mm ~ bill_depth_mm + species, 
-              data = penguins)
-tidy(bill_mod) %>% 
-  kableExtra::kable()
+```{r scatter, echo=FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
+library(ggplot2)
+library(ggthemes)
+library(tidyverse)
+library(dplyr)
+library(maps)
+library(plotly)
+library(readr)
+library(ggridges)
+theme_proj = theme_tufte() + 
+  theme(plot.title.position = "plot")
+spotify_by_year <- read_csv("data/data_by_year.csv")
+ggplot(data = spotify_by_year) +
+  geom_point(mapping = aes(x = year, y = valence)) +
+  labs(title = "Happiness of Music Over Time",
+       x = "Year",
+       y = "Valence (0 to 1)",
+       caption = "SOURCE: Spotify") +
+  theme_proj +
+  #need to add gridlines because tufte removes them
+  theme(panel.grid.major = element_line(color = "gray90"),
+        panel.grid.minor = element_line(color = "gray90"))
 ```
+
+---
+# Exploring Happiness Dataset
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+#loading dataset of each country's ISO code (because plotly needs it to map countries)
+# source: https://www.kaggle.com/andradaolteanu/iso-country-codes-global
+country_code <- read_csv("data/wikipedia-iso-country-codes.csv")
+happiness_2015 <- read.csv("data/2015.csv") %>% mutate(year = 2015)
+happiness_2016 <- read.csv("data/2016.csv") %>% mutate(year = 2016)
+happiness_2017 <- read.csv("data/2017.csv") %>% mutate(year = 2017)
+happiness_2018 <- read.csv("data/2018.csv") %>% mutate(year = 2018)
+happiness_2019 <- read.csv("data/2019.csv") %>% mutate(year = 2019)
+happiness_2020 <- read.csv("data/2020.csv") %>% mutate(year = 2020)
+
+colnames(happiness_2017) = c("Country", "Happiness.Rank", "Happiness.Score",
+                             "Upper.Confidence.Interval", "Lower.Confidence.Interval",
+                             "Economy..GDP.per.Capita.", "Family", "Health..Life.Expectancy.",
+                             "Freedom", "Generosity", "Trust..Government.Corruption.",
+                             "Dystopia.Residual", "year")
+
+colnames(happiness_2018) = c("Happiness.Rank", "Country", "Happiness.Score",
+                             "Economy..GDP.per.Capita.", "Family", "Health..Life.Expectancy.",
+                             "Freedom", "Generosity", "Trust..Government.Corruption.",
+                             "year")
+
+colnames(happiness_2019) = c("Happiness.Rank", "Country", "Happiness.Score",
+                             "Economy..GDP.per.Capita.", "Family", "Health..Life.Expectancy.",
+                             "Freedom", "Generosity", "Trust..Government.Corruption.",
+                             "year")
+
+colnames(happiness_2020) = c("Country", "Region", "Happiness.Score", "Standard.Error",
+                             "Upper.Confidence.Interval", "Lower.Confidence.Interval",
+                             "Logged.GDP.per.capita", "Family", "Healthy.life.expectancy",
+                             "Freedom", "Generosity", "Trust..Government.Corruption.",
+                             "Ladder.score.in.Dystopia", "Explained.by..Log.GDP.per.capita",
+                             "Explained.by..Social.support",
+                             "Explained.by..Healthy.life.expectancy",
+                             "Explained.by..Freedom.to.make.life.choices",
+                             "Explained.by..Generosity",
+                             "Explained.by..Perceptions.of.corruption",
+                             "Dystopia.Residual", "year")
+
+happiness_2018 <- happiness_2018[-20,]
+happiness_2018 <- happiness_2018 %>% mutate(Trust..Government.Corruption. =
+                                              as.numeric(Trust..Government.Corruption.))
+
+happiness_2015 <- happiness_2015 %>% mutate(mean = mean(Happiness.Score))
+happiness_2016 <- happiness_2016 %>% mutate(mean = mean(Happiness.Score))
+happiness_2017 <- happiness_2017 %>% mutate(mean = mean(Happiness.Score))
+happiness_2018 <- happiness_2018 %>% mutate(mean = mean(Happiness.Score))
+happiness_2019 <- happiness_2019 %>% mutate(mean = mean(Happiness.Score))
+happiness_2020 <- happiness_2020 %>% mutate(mean = mean(Happiness.Score))
+
+happiness <- happiness_2015 %>% bind_rows(happiness_2016) %>% bind_rows(happiness_2017) %>%
+  bind_rows(happiness_2018) %>% bind_rows(happiness_2019) %>% bind_rows(happiness_2020)
+
+#joining together happiness and country_code dataset
+happiness_plotly <- left_join(country_code, happiness, by = c("English short name lower case" = "Country"))
+
+#renaming the happiness dataset variables
+colnames(happiness_plotly) = c("Country", "two.code", "three.code", "Numeric.code", "ISO",
+                        "Region", "Happiness.Rank", "Happiness.Score", "Standard.Error",
+                        "Economy..GDP.per.Capita.", "Family", "Health..Life.Expectancy.",
+                        "Freedom", "Trust..Government.Corruption.", "Generosity",
+                        "Dystopia.Residual", "year", "mean", "Lower.Confidence.Interval",
+                        "Upper.Confidence.Interval", "Logged.GDP.per.capita",
+                        "Healthy.life.expectancy", "Ladder.score.in.Dystopia",
+                        "Explained.by..Log.GDP.per.capita", "Explained.by..Social.support",
+                        "Explained.by..Healthy.life.expectancy",
+                        "Explained.by..Freedom.to.make.life.choices",
+                        "Explained.by..Generosity",
+                        "Explained.by..Perceptions.of.corruption")
+
+#"hover" variable: this specifies what info is displayed when you hover over a country
+happiness_plotly <- happiness_plotly %>% mutate(hover = paste0(Country, "\nHappiness Rank: ", Happiness.Rank, "\nHappiness Score: ", Happiness.Score))
+
+#hover label aesthetics
+fontStyle <- list(family = "Arial", size = 15, color = "black")
+label <- list(bgcolor = "#EEEEEE", bordercolor = "transparent", font = fontStyle)
+
+#plotly map!
+p1 <- plot_geo(happiness_plotly, locationmode = "world", frame = ~year) %>%
+  add_trace(locations = ~three.code,
+            z = ~Happiness.Score,
+            zmin = 2,
+            zmax = 8,
+            color = ~Happiness.Score,
+            colorscale = "Electric", #changes color of scale (other options: RdBu, Viridis, Rainbow)
+            text = ~hover, #displays info in "hover" variable we made above
+            hoverinfo = "text") %>% #makes hover info the text from above line
+  layout(font = list(family = "Arial"), title = "World Happiness Report \n 2015 - 2020") %>%
+  style(hoverlabel = label) %>%
+  config(displayModeBar = FALSE) #hides the plotly toolbar in top right
+
+p1
+
+# credit to this tutorial: https://www.youtube.com/watch?v=RrtqBYLf404
+```
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
+library(patchwork)
+#happiness_ridges <- happiness %>% filter(year == 2015 | year == 2016 | year == 2020)
+plot0 <- ggplot(happiness_2015, aes(y = Region, x = Happiness.Score, fill = Region)) + 
+  geom_density_ridges(alpha = .8) +
+  scale_fill_viridis_d(end = .75, option = "C") + 
+  scale_color_viridis_d(end = .75, option = "C") + 
+  theme_proj +
+  theme(legend.position = "none") +
+  labs(title = "Happiness Score of Each Region",
+       x = "Happiness Score",
+       y = "Region",
+       caption = "SOURCE: World Happiness Report")
+
+plot1 <- ggplot(happiness_2016, aes(y = Region, x = Happiness.Score, fill = Region)) +
+  geom_density_ridges(alpha = .8) +
+  scale_fill_viridis_d(end = .75, option = "C") +
+  scale_color_viridis_d(end = .75, option = "C") +
+  theme_proj +
+  theme(legend.position = "none") +
+  labs(title = "Happiness Score of Each Region",
+       x = "Happiness Score",
+       y = "Region",
+       caption = "SOURCE: World Happiness Report")
+
+plot2 <- ggplot(happiness_2020, aes(y = Region, x = Happiness.Score, fill = Region)) +
+  geom_density_ridges(alpha = .8) +
+  scale_fill_viridis_d(end = .75, option = "C") +
+  scale_color_viridis_d(end = .75, option = "C") +
+  theme_proj +
+  theme(legend.position = "none") +
+  labs(title = "Happiness Score of Each Region",
+       x = "Happiness Score",
+       y = "Region",
+       caption = "SOURCE: World Happiness Report")
+
+plot0 + plot1 + plot2
+```
+
+---
+# Exploring Crime Dataset
+
+(Blank for now!)
+
+---
+# Crime & Happiness Over Time
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
+ggplot(data = happiness) +
+  geom_point(mapping = aes(x = year, y = mean)) +
+  geom_line(mapping = aes(x = year, y = mean)) +
+  labs(title = "World Happiness Score Over Time",
+       subtitle = "average of every country's score each year",
+       x = "",
+       y = "Happiness Score",
+       caption = "SOURCE: World Happiness Report") +
+  theme_proj +
+  #need to add gridlines because tufte removes them
+  theme(panel.grid.major = element_line(color = "gray90"),
+        panel.grid.minor = element_line(color = "gray90"))
+```
+
+(Insert crime plots here?)
+
+---
+# Comparisons
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
+spotify_by_year_small <- spotify_by_year %>% filter(year == 2015 | year == 2016 | year == 2017 | year == 2018 | year == 2019 | year == 2020)
+
+spotify_and_happiness <- left_join(spotify_by_year_small, happiness, by = c("year" = "year"))
+ggplot(data = spotify_and_happiness) +
+  geom_point(mapping = aes(x = valence, y = mean)) +
+  theme_proj +
+  #need to add gridlines because tufte removes them
+  theme(panel.grid.major = element_line(color = "gray90"),
+        panel.grid.minor = element_line(color = "gray90"))
+```
+
+(Insert crime & music comparison plot here)
+
+---
+# Discussion
 

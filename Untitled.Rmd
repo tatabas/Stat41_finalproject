@@ -1,0 +1,138 @@
+---
+title: "Interactive Presentation Ninja"
+subtitle: "⚔<br/>with interactingan"
+author: "Juan Cruz Rodriguez"
+institute: "FAMAF - UNC"
+date: "2020/01/10 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+# Connect to the app!
+
+```{r echo=FALSE, message=FALSE, fig.align='center'}
+library("interactingan")
+# Will configure an empty app to the shinyapps server;
+# and show a qr code that points to the interactingan app url
+set_app()
+```
+
+---
+
+# Which R package you use most?
+
+`r interactingan::wordcloud("Most used R package", max_words = 1)`
+```{r shiny-ggally}
+library(shiny)
+
+ui <- fluidPage(
+    
+    # Application title
+    titlePanel("Looking at Music Trends (make a selection)"),
+    
+    # Sidebar layout with a input and output definitions
+    sidebarLayout(
+        # Inputs: Select variables to plot
+        sidebarPanel(
+            
+            # Select variable for location
+            selectInput(inputId = "x", 
+                        label = "X Axis: ",
+                        choices = c("Valence" = "valence", "Acousticness" = "acousticness",
+                                    "Danceability" = "danceability", "Duration" = "duration_ms", 
+                                    "Energy" = "energy", "Instrumentalness" = "instrumentalness",
+                                    "Liveness" = "liveness", "Loudness" = "loudness", 
+                                    "Popularity" = "popularity", "Speechiness" = "speechiness"),
+                        selected = "acousticness",
+                        multiple = FALSE),
+            
+            selectInput(inputId = "y",
+                        label = "Y Axis: ",
+                        choices = c("Valence" = "valence", "Acousticness" = "acousticness",
+                                    "Danceability" = "danceability", "Duration" = "duration_ms", 
+                                    "Energy" = "energy", "Instrumentalness" = "instrumentalness",
+                                    "Liveness" = "liveness", "Loudness" = "loudness", 
+                                    "Popularity" = "popularity", "Speechiness" = "speechiness"),
+                        selected = "energy",
+                        multiple = FALSE),
+            
+            checkboxInput(inputId = "mod",
+                          label = "Line",
+                          value = TRUE)
+        ),
+        
+        #Output
+        
+        mainPanel(
+            
+            # Show plot
+            plotOutput(outputId = "plot"),
+            br(),        # a little bit of visual separation
+            
+        )
+    )
+)
+
+# Define server function --------------------------------------------
+server <- function(input, output) {
+    
+    output$plot <- renderPlot({
+   p3 <- 
+     spotify_by_year %>%
+     mutate(
+       constant = 0.02
+     ) %>%
+     ggplot(aes_string(x = input$x, y = input$y)) +
+     geom_point(aes(text = paste("Year:",year))) +
+     theme_proj +
+          #need to add gridlines because tufte removes them
+          theme(panel.grid.major = element_line(color = "gray90"),
+                panel.grid.minor = element_line(color = "gray90"),
+                legend.position = "none") +
+          labs(x = input$x, y = input$y,
+               caption = "Source: Spotify") +
+       if(input$mod) {geom_smooth(method = "lm", se = FALSE)}
+   
+   
+    p3
+    })
+}
+
+# Create the Shiny app object ---------------------------------------
+shinyApp(ui, server, options = list(height = 500))
+```
+
+---
+
+# Have you ever used interactive slides?
+
+`r poll("Do you use interactive slides?", c("Yes", "No", "Won't answer!"))`
+
+---
+
+# How much do you like the `interactingan` package?
+
+`r rating("Rate interactingan:")`
+
+---
+
+# What do you think about the `interactingan` package?
+
+`r question("Opinion about interactingan:")`
+
+---
+
+# Questions?
+
+<!-- Show the audience question's pane -->
+`r audience_questions()`
+
+```{r echo=FALSE}
+# Deploys the final interactingan app to the shinyapps server
+deploy_interactions()
+```
