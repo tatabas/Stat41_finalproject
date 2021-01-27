@@ -402,3 +402,40 @@ rm(sexualviolence10, sexualviolence11, sexualviolence12, sexualviolence13, sexua
 
 write.csv(assault, "data/sexualviolence.csv")
 ```
+
+```{r alltogether-crime}
+spotify2 <- spotify %>%
+  filter(year >= 2010 & year <= 2017) %>%
+  group_by(year) %>%
+  summarise(
+    perc_expl = round(sum(explicit == 1)/(sum(explicit == 1) + sum(explicit == 0)),2),
+    perc_non_expl = round(sum(explicit == 0)/(sum(explicit == 1) + sum(explicit == 0)),2)
+    )
+
+comparing_assault <- spotify2 %>%
+  filter(year >= 2010 & year <= 2017) %>%
+  inner_join(., subset(assault, select = c(-Subregion, -Country)) %>% group_by(Region), by = c("year" = "Year")) %>%
+  mutate(
+    type = "Assault"
+  )
+
+comparing_robbery <- spotify2 %>%
+  filter(year >= 2010 & year <= 2017) %>%
+  inner_join(., subset(robbery, select = c(-Subregion, -Country)), by = c("year" = "Year")) %>%
+  mutate(
+    type = "Robbery"
+  )
+
+comparing_sexualviolence <- spotify2 %>%
+  filter(year >= 2010 & year <= 2017) %>%
+  inner_join(., subset(sexualviolence, select = c(-Subregion, -Country)), by = c("year" = "Year")) %>%
+  mutate(
+    type = "Sexual Violence"
+  )
+
+all_together <- comparing_assault %>% bind_rows(comparing_robbery) %>% bind_rows(comparing_sexualviolence)
+
+rm(spotify2, comparing_assault, comparing_robbery, comparing_sexualviolence)
+
+write.csv(all_together, "data/alltogether.csv")
+```

@@ -19,18 +19,20 @@ library(readr)
 ```
 
 ```{r plot themes}
-theme_proj = theme_tufte() + 
-  theme(plot.title.position = "plot")
+theme_proj = theme_minimal(base_family = "Palatino") + 
+  theme(plot.title.position = "plot",
+        plot.background = element_rect(fill = "#FEF5D1"))
 ```
 
 ```{r loading data, echo = TRUE}
-#data is cleaned in ATABAS_HUANG_dataCleaning.Rmd
+#data is cleaned in ATABAS_HUANG_dataCleaning.Rmd and loaded here
 spotify <- read.csv("data/data.csv")
 spotify_by_year <- read.csv("data/data_by_year.csv")
 happiness <- read.csv("data/happiness.csv")
 robbery <- read.csv("data/robbery.csv")
 assault <- read.csv("data/assault.csv")
 sexualviolence <- read.csv("data/sexualviolence.csv")
+all_together <- read.csv("data/alltogether.csv")
 ```
 
 # Introduction
@@ -63,11 +65,8 @@ ggplot(data = spotify_by_year) +
   labs(title = "Happiness of Music Over Time",
        x = "Year",
        y = "Valence (0 to 1)",
-       caption = "SOURCE: Spotify") +
-  theme_proj +
-  #need to add gridlines because tufte removes them
-  theme(panel.grid.major = element_line(color = "gray90"),
-        panel.grid.minor = element_line(color = "gray90"))
+       caption = "Source: Spotify") +
+  theme_proj 
 ```
 
 
@@ -134,8 +133,13 @@ library(GGally)
 
 spotify_by_year %>%
   select(valence, acousticness, danceability, duration_ms, energy, instrumentalness, liveness, loudness, popularity, speechiness) %>%
-  GGally::ggpairs()
+  GGally::ggpairs() +
+  theme_proj +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  labs(caption = "Source: Spotify", title = "Pairs plot for music")
 ```
+
 
 By looking at the pairs plot, it is possible to see that acousticness and energy are inversely related, and pretty strong at that (refer to plot with \@ref(fig:gally), r = -0.967***). There are many other relationships to explore later when building a model. However, another promising relationships is between the loudness and popularity parameters. The songs that are louder also have a tendancy to be more popular.
 
@@ -194,7 +198,6 @@ ui <- fluidPage(
 server <- function(input, output) {
     
     output$plot <- renderPlotly({
-            
    p3 <- 
      spotify_by_year %>%
      mutate(
@@ -208,7 +211,7 @@ server <- function(input, output) {
                 panel.grid.minor = element_line(color = "gray90"),
                 legend.position = "none") +
           labs(x = input$x, y = input$y,
-               caption = "Source: Spotify API") +
+               caption = "Source: Spotify") +
        if(input$mod) {geom_smooth(method = "lm", se = FALSE)}
    
    
@@ -295,7 +298,7 @@ ggplot(happiness, aes(y = Region, x = Happiness.Score, fill = Region)) +
   labs(title = "Happiness Score of Each Region",
        x = "Happiness Score",
        y = "Region",
-       caption = "SOURCE: World Happiness Report")
+       caption = "Source: World Happiness Report")
 ```
 
 The plot above shows a density plot of the happiness scores across different regions of the world. Note that some countries are included twice (ex: in Southeastern Asia AND in South Asia), as well as the fact that $2017$, $2018$, and $2019$ do not split countries into regions, so the happiness score is not plotted for those years. We can see that the happiest regions appear to be North America and Australia and New Zealand.
@@ -308,7 +311,7 @@ ggplot(data = happiness) +
        subtitle = "average of every country's score each year",
        x = "",
        y = "Happiness Score",
-       caption = "SOURCE: World Happiness Report") +
+       caption = "Source: World Happiness Report") +
   theme_proj +
   theme(panel.grid.major = element_line(color = "gray90"),
         panel.grid.minor = element_line(color = "gray90"))
@@ -393,7 +396,7 @@ server <- function(input, output) {
                 panel.grid.minor = element_line(color = "gray90"),
                 legend.position = "none") +
           labs(x = "Year", y = "Assault rate (per 100,000 population)",
-               caption = "Source: UNOCD Serious Assault Data")
+               caption = "Source: UNOCD Serious Assault Crime Data")
           
             
         
@@ -430,7 +433,7 @@ p1 <- assault %>%
   guides(fill = FALSE) +
   labs(x = "Year", y = "Mean Rate per 100,000 population",
        title = "Mean Rate of Assault per 100,000 population by Year",
-       caption = "Source: UNODC Serious Assault Data") +
+       caption = "Source: UNODC Serious Assault Crime Data") +
   theme(plot.title = element_text(size = 8)) +
   theme(axis.text.x = element_text(angle = 45, vjust = .1, hjust=.1)) +
   facet_grid(. ~ Region)
@@ -464,7 +467,7 @@ p3 <- sexualviolence %>%
   guides(fill = FALSE) +
   labs(x = "Year", y = element_blank(),
        title = "Mean Rate of Sexual Violence per 100,000 population by Year",
-       caption = "Source: UNODC Sexual Violence Data") +
+       caption = "Source: UNODC Sexual Violence Crime Data") +
   theme(plot.title = element_text(size = 8), 
         axis.text.x = element_text(angle = 45, vjust = .1, hjust=.1)) +
   facet_grid(. ~ Region)
@@ -509,75 +512,19 @@ summary(spotify_happiness_lm)
 
 ## Crime and Explicitness
 
-```{r}
-comparing_assault <- spotify %>%
-  filter(year >= 2010 & year <= 2017) %>%
-  inner_join(., assault, by = c("year" = "Year")) %>%
-  mutate(
-    type = "Assault"
-  )
-
-comparing_robbery <- spotify %>%
-  filter(year >= 2010 & year <= 2017) %>%
-  inner_join(., robbery, by = c("year" = "Year")) %>%
-  mutate(
-    type = "Robbery"
-  )
-
-comparing_sexualviolence <- spotify %>%
-  filter(year >= 2010 & year <= 2017) %>%
-  inner_join(., sexualviolence, by = c("year" = "Year")) %>%
-  mutate(
-    type = "Sexual Violence"
-  )
-
-all_together <- comparing_assault %>% bind_rows(comparing_robbery) %>% bind_rows(comparing_sexualviolence)
-```
-
-```{r crimeandexplicitness, fig.width = 9, fig.height= 3, fig.cap = "Logistic regression on rates of crime and explicitness of songs by region for the years 2010 - 2017"}
-c1 <- ggplot(data = comparing_assault, aes(x = Rate, y = explicit)) +
-  geom_jitter(width = 0.3, height = 0.05, alpha = 0.3, size = 0.05) +
-  geom_smooth(
-    method = "glm", method.args = list(family = "binomial"), 
-    color = "dodgerblue", se = FALSE
-  ) +
-  facet_grid(. ~ Region, scale = "free_x") +
-  theme_proj
-
-c2 <- ggplot(data = comparing_robbery, aes(x = Rate, y = explicit)) +
-  geom_jitter(width = 0.3, height = 0.1, alpha = 0.3, size = 0.05) +
-  geom_smooth(
-    method = "glm", method.args = list(family = "binomial"), 
-    color = "dodgerblue", se = FALSE
-  ) +
-  facet_grid(. ~ Region, scale = "free_x")+
-  theme_proj
-
-c3 <- ggplot(data = comparing_sexualviolence, aes(x = Rate, y = explicit)) +
-  geom_jitter(width = 0.3, height = 0.05, alpha = 0.3, size = 0.05) +
-  geom_smooth(
-    method = "glm", method.args = list(family = "binomial"), 
-    color = "dodgerblue", se = FALSE
-  ) +
-  facet_grid(. ~ Region, scale = "free_x") +
-  theme_proj
-
-c1 + c2 + c3
-```
-```{r}
-ggplot(data = all_together, aes(x = Rate, y = explicit)) +
-  geom_jitter(width = 0.3, height = 0.05, alpha = 0, size = 0.05) +
-  geom_smooth(
+```{r regress-assault, fig.cap="Comparing rate and percent explicit music per year for 2010-2017, displayed by region for each type of crime: assault, robbery, and sexual violence"}
+all_together %>%
+  ggplot(aes(x = Rate, y = perc_expl, color = year)) +
+    geom_point(size = 0.3, alpha = 0.6) +
+    geom_smooth(
     method = "glm", method.args = list(family = "binomial"), 
     color = "dodgerblue", se = FALSE, size = 1
-  ) +
-  facet_grid(type ~ Region, scale = "free_x") +
-  theme_proj
+    ) +
+    scale_color_distiller(palette = "YlOrRd", direction = 1) +
+    facet_grid(type ~ Region, scale = "free") +
+    labs(y = "% Explicit Music", color = "Year", caption = "Source: UNODC Crime Data and Spotify API") +
+    theme_proj
 ```
-
-# Predicting the Next Popular Song!
-
-(Here, we plan on using a multiple regression to try and predict what attributes the next popular song will have. We're unsure how to visualize this, but we know you can fit a multiple linear regression to it.)
 
 # Conclusions & Discussions
 
