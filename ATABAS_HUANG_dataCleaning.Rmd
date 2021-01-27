@@ -12,6 +12,9 @@ library(dplyr)
 ```
 
 Reading in the happiness dataset:
+
+The data is made available from the World Happiness Report in the format of separate CSV files per year from 2015 to 2020. Additionally, there were issues that required the conversion of some fields such as "Trust in Government" to numeric values. The remaining issue was to make the variable names more natural instead of names that have "coded" structures or names that contain ".." .
+
 ```{r reading-happiness-datasets}
 # reading in world happiness datasets
 happiness_2015 <- read.csv("data/2015.csv") %>% mutate(year = 2015)
@@ -75,6 +78,9 @@ rm(happiness_2015, happiness_2016, happiness_2017, happiness_2018, happiness_201
 ```
 
 Reading in the Crime - Assault Dataset:
+
+The UNODC only has Excel files available as a method to download the data. This is not a limitation, since the `library(readxl)` can handle this. However, the format of the files were not user friendly in any way. The table was wide instead of long, so that was the first problem in the system. Additionally, the header (variable names) were incorrectly matched because the years are up top in their own row in the spreadsheet, with the important variable names in the second row. Therefore, R interpreted the variable names as the first observation. The only method that worked without too much of a hassle was to read the table by year, make the data frame longer with `pivot_longer()`, and then merge all the years into one large set.
+
 ```{r ASSAULT}
 library(readxl)
 
@@ -186,6 +192,9 @@ write.csv(assault, "data/assault.csv")
 ```
 
 Loading in the Crime - Robbery Dataset:
+
+This excel file for crime also comes from UNODC, so it suffers from the same organization peril outlined in the assault data set. The robbery rates and counts were loaded in by year and then merged.
+
 ```{r robberyload}
 library(readxl)
 
@@ -296,6 +305,9 @@ rm(robbery10, robbery11, robbery12, robbery13, robbery14, robbery15, robbery16, 
 write.csv(robbery, "data/robbery.csv")
 ```
 
+Loading in the Crime - Sexual Violence Dataset:
+
+This excel file for crime also comes from UNODC, so it suffers from the same organization peril outlined in the assault data set. The sexual violence rates and counts were loaded in by year and then merged.
 
 ```{r sexualviolence}
 library(readxl)
@@ -403,6 +415,11 @@ rm(sexualviolence10, sexualviolence11, sexualviolence12, sexualviolence13, sexua
 write.csv(assault, "data/sexualviolence.csv")
 ```
 
+
+Merging Spotify and Crime:
+
+In order to create a point of comparison between the crime rates and explicit music over the years of 2010-2017, it was necessary to create a common dataset. Therefore, the percentage of explicit music per year was calculated from the Spotify dataset, so that there was data for the year, percent explicit and percent non-explicit music. Then a dataset was created that had explicit percents, region, country, and crime rate with type (assault, robbery, sexual violence). In this way, it is possible to create plots that can compare rate of crime and the prevalence of explicit music. 
+
 ```{r alltogether-crime}
 spotify2 <- spotify %>%
   filter(year >= 2010 & year <= 2017) %>%
@@ -414,21 +431,22 @@ spotify2 <- spotify %>%
 
 comparing_assault <- spotify2 %>%
   filter(year >= 2010 & year <= 2017) %>%
-  inner_join(., subset(assault, select = c(-Subregion, -Country)) %>% group_by(Region), by = c("year" = "Year")) %>%
+  inner_join(., subset(assault, select = c(-Subregion)) %>% group_by(Region), 
+             by = c("year" = "Year")) %>%
   mutate(
     type = "Assault"
   )
 
 comparing_robbery <- spotify2 %>%
   filter(year >= 2010 & year <= 2017) %>%
-  inner_join(., subset(robbery, select = c(-Subregion, -Country)), by = c("year" = "Year")) %>%
+  inner_join(., subset(robbery, select = c(-Subregion)), by = c("year" = "Year")) %>%
   mutate(
     type = "Robbery"
   )
 
 comparing_sexualviolence <- spotify2 %>%
   filter(year >= 2010 & year <= 2017) %>%
-  inner_join(., subset(sexualviolence, select = c(-Subregion, -Country)), by = c("year" = "Year")) %>%
+  inner_join(., subset(sexualviolence, select = c(-Subregion)), by = c("year" = "Year")) %>%
   mutate(
     type = "Sexual Violence"
   )

@@ -24,20 +24,9 @@ theme_proj = theme_minimal(base_family = "Palatino") +
         plot.background = element_rect(fill = "#FEF5D1"))
 ```
 
-```{r loading data, echo = TRUE}
-#data is cleaned in ATABAS_HUANG_dataCleaning.Rmd and loaded here
-spotify <- read.csv("data/data.csv")
-spotify_by_year <- read.csv("data/data_by_year.csv")
-happiness <- read.csv("data/happiness.csv")
-robbery <- read.csv("data/robbery.csv")
-assault <- read.csv("data/assault.csv")
-sexualviolence <- read.csv("data/sexualviolence.csv")
-all_together <- read.csv("data/alltogether.csv")
-```
-
 # Introduction
 
-(Note: loading all data from ATABAS_HUANG_loadData.Rmd)
+[GitHub](https://github.com/tatabas/Stat41_finalproject)
 
 Music has an incredibly fascinating effect on people. Humans are one of the few, if not the only, animals that can naturally feel rhythms. When music is played, it only takes moments for people to clap along to the beat of the song. Specific genres and styles of music have defined generations and cultures time and time again. It’s only natural for music to be so powerful for people.
 
@@ -74,6 +63,8 @@ In addition to a study of trends in music consumption, this study aims to take a
 
 # Data
 
+The datasets used in this project required lots of work to clean and prepare for visualization and analysis. The data cleaning and code is outlines in the [ATABAS_HUANG_dataCleaning.Rmd file](https://github.com/tatabas/Stat41_finalproject), with short descriptions attached for each cleaning procedure.
+
 **Music:**
 The music dataset is made available through the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). Spotify is an audio streaming service that was launched in 2008 and is now one of the most popular streaming platforms for music and podcasts. Therefore, the dataset is fairly comprehensive and contains lots of  information due to Spotify’s status as one of the most popular sites for music consumption. 
 
@@ -85,17 +76,17 @@ Other metrics such as explicitness are described as follows: “Whether or not t
 
 **Crime:**
 
-The United Nations Office on Drugs and Crime (UNODC) has many comprehensive datasets that pertain to crime of all different shapes and forms. The organization, as a subset of the United Nations works to cover pressing concerns related to crime, tackling crime, and preventing crime. The datasets present on their website are grouped in a manner that makes it easy to choose what to study. For example, the differentiation is made between sexual assault, homicide, and drug crimes. Further, homicide can be analyzed more specifically through the different mechanisms (firearm, sharp object, unkown, etc.)
+The United Nations Office on Drugs and Crime (UNODC) has many comprehensive datasets that pertain to crime of all different shapes and forms. The organization, as a subset of the United Nations, works to cover pressing concerns related to crime in general, but they focus on tackling and/or preventing crime. The datasets present on their website are grouped by type of crime with subsets for more details. For example, there are differentiations made between sexual violence, homicide, and assault. Further, assault can be analyzed more specifically through the different mechanisms (firearm, sharp object, serious, etc.)
 
-With a dataset of this comprehensive nature, it is possible to make different comparisons by extracting the parts of the data that are of interest. 
+With a dataset of this comprehensive nature, it is possible to make different comparisons by extracting the parts of the data that are of interest. In this case, it was of interest to study the relationship between trends in crime and trends in explicit music. There are many studies that have shown types of music to have a postivie impact (classical music, joyous music). However, there are also claims that media in the form of video games, TV, or music can have an equally negative impact depending on their contents. Along these lines, it may be interesting to explore any relationships between explicit music and crime.
 
-Some limitations to this dataset it more about the collection than anything. The data are collected from the annual United Nations crime trends survey from national authorities. This method not only relies on countries reporting to the U.N., but also relies on local authorities within countries like the U.S. and their reports to the federal level. There may be differences in reporting crime when compared to different countries, and that disparity can also exist within any given country, as well. This needs to be kept in consideration when drawing conclusions.
+The limitations to this dataset originate more from the collection process. The data are collected from the annual United Nations crime trends survey. This is conducted by the UNODC and takes responses from the government officials in a given country. This method not only relies on countries reporting to the U.N., but also relies on local authorities within countries like the U.S. and their reports to the federal level. There may be differences in reporting crime when compared to different countries, because each country can have different laws regarding different crimes. Even states or counties within a given country can have different guidelines for recording a crime. This should be kept in consideration when drawing conclusions.
 
 Since all of these datasets were provided in separate files, it was necessary to read the excel files separately and then follow with a merge by year.
 
 The data also comes in a format that is not easy to work with, having a column of rate and count for each year (i.e. rate of crime, count of crime). The years available are from 2010 to 2017.
 
-The data from UNODC will be in regards to
+The data from UNODC will be used to study
 
 + Assault 
 + Robbery
@@ -527,6 +518,11 @@ all_together %>%
 ```
 
 # Conclusions & Discussions
+
+```{r}
+
+glimpse(sample_n(spotify, 5))
+```
 
 (This will depend on what happens after we look at valence & world happiness and crime & explicitness.)
 
