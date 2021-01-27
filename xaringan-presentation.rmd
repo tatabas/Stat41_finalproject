@@ -72,12 +72,23 @@ Music has strong effects on the brain, specifically on: memory, movement, and em
 ---
 # Crime Dataset
 
-([tablesgenerator.com](https://www.tablesgenerator.com) is great for making markdown tables)
+There are separate datasets for Assault, Robbery and Sexual Violence. All follow the same structure outlines below:
+
+| Variable  | Type | Description                          | Example     |
+|-----------|------|--------------------------------------|-------------|
+| Region    | chr  | Continent in the world               | Africa      |
+| Subregion | chr  | Geographic areas within continents   | East Africa |
+| Country   | chr  | A country                            | Burundi     |
+| Rate      | num  | Rate of crime per 100,000 population | 35.028      |
+| Count     | int  | Total number of crime incidents      | 3039        |
+| Year      | int  | Year                                 | 2010        |
 
 ---
 # Exploring Spotify Dataset
 
-```{r scatter, echo=FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
 library(ggplot2)
 library(ggthemes)
 library(tidyverse)
@@ -86,8 +97,23 @@ library(maps)
 library(plotly)
 library(readr)
 library(ggridges)
-theme_proj = theme_tufte() + 
+
+theme_proj = theme_minimal() + 
   theme(plot.title.position = "plot")
+
+#loading data
+#data is cleaned in ATABAS_HUANG_dataCleaning.Rmd and loaded here
+spotify <- read.csv("data/data.csv")
+spotify_by_year <- read.csv("data/data_by_year.csv")
+happiness <- read.csv("data/happiness.csv")
+robbery <- read.csv("data/robbery.csv")
+assault <- read.csv("data/assault.csv")
+sexualviolence <- read.csv("data/sexualviolence.csv")
+all_together <- read.csv("data/alltogether.csv")
+
+```
+
+```{r scatter, fig.height = 3, fig.width = 4, dpi = 150}
 spotify_by_year <- read_csv("data/data_by_year.csv")
 ggplot(data = spotify_by_year) +
   geom_point(mapping = aes(x = year, y = valence)) +
@@ -95,16 +121,13 @@ ggplot(data = spotify_by_year) +
        x = "Year",
        y = "Valence (0 to 1)",
        caption = "SOURCE: Spotify") +
-  theme_proj +
-  #need to add gridlines because tufte removes them
-  theme(panel.grid.major = element_line(color = "gray90"),
-        panel.grid.minor = element_line(color = "gray90"))
+  theme_proj 
 ```
 
 ---
 # Exploring Happiness Dataset
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
+```{r happy-map, echo = FALSE, message = FALSE, warning = FALSE}
 #loading dataset of each country's ISO code (because plotly needs it to map countries)
 # source: https://www.kaggle.com/andradaolteanu/iso-country-codes-global
 country_code <- read_csv("data/wikipedia-iso-country-codes.csv")
@@ -200,41 +223,54 @@ p1
 # credit to this tutorial: https://www.youtube.com/watch?v=RrtqBYLf404
 ```
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
+```{r happy-ridges, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
 library(patchwork)
 #happiness_ridges <- happiness %>% filter(year == 2015 | year == 2016 | year == 2020)
+happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(5, 1), ])
+happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(15, 1), ])
+happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(9, 1), ])
+happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(10, 1), ])
+
+happiness_2016 <- rbind(happiness_2016, happiness_2016[rep(6, 1), ])
+happiness_2016 <- rbind(happiness_2016, happiness_2016[rep(13, 1), ])
+happiness_2016 <- rbind(happiness_2016, happiness_2016[rep(8, 1), ])
+happiness_2016 <- rbind(happiness_2016, happiness_2016[rep(9, 1), ])
+  
 plot0 <- ggplot(happiness_2015, aes(y = Region, x = Happiness.Score, fill = Region)) + 
   geom_density_ridges(alpha = .8) +
-  scale_fill_viridis_d(end = .75, option = "C") + 
-  scale_color_viridis_d(end = .75, option = "C") + 
+  scale_fill_viridis_d(end = .75, option = "B") + 
+  scale_color_viridis_d(end = .75, option = "B") + 
   theme_proj +
-  theme(legend.position = "none") +
+  theme(legend.position = "none",
+        plot.subtitle = element_text(hjust = 1)) +
   labs(title = "Happiness Score of Each Region",
-       x = "Happiness Score",
+       subtitle = "2015",
        y = "Region",
-       caption = "SOURCE: World Happiness Report")
+       x = element_blank())
 
 plot1 <- ggplot(happiness_2016, aes(y = Region, x = Happiness.Score, fill = Region)) +
   geom_density_ridges(alpha = .8) +
-  scale_fill_viridis_d(end = .75, option = "C") +
-  scale_color_viridis_d(end = .75, option = "C") +
+  scale_fill_viridis_d(end = .75, option = "B") +
+  scale_color_viridis_d(end = .75, option = "B") +
   theme_proj +
-  theme(legend.position = "none") +
-  labs(title = "Happiness Score of Each Region",
-       x = "Happiness Score",
-       y = "Region",
-       caption = "SOURCE: World Happiness Report")
+  theme(legend.position = "none",
+        axis.text.y = element_blank(),
+        plot.subtitle = element_text(hjust = 1)) +
+  labs(subtitle = "2016",
+       y = element_blank(), 
+       x ="Happiness Score")
 
 plot2 <- ggplot(happiness_2020, aes(y = Region, x = Happiness.Score, fill = Region)) +
   geom_density_ridges(alpha = .8) +
-  scale_fill_viridis_d(end = .75, option = "C") +
-  scale_color_viridis_d(end = .75, option = "C") +
+  scale_fill_viridis_d(end = .75, option = "B") +
+  scale_color_viridis_d(end = .75, option = "B") +
   theme_proj +
-  theme(legend.position = "none") +
-  labs(title = "Happiness Score of Each Region",
-       x = "Happiness Score",
-       y = "Region",
-       caption = "SOURCE: World Happiness Report")
+  theme(legend.position = "none",
+        plot.subtitle = element_text(hjust = 1))+
+  labs(subtitle = "2020",
+       caption = "SOURCE: World Happiness Report",
+       y = element_blank(), 
+       x = element_blank())
 
 plot0 + plot1 + plot2
 ```
@@ -242,12 +278,64 @@ plot0 + plot1 + plot2
 ---
 # Exploring Crime Dataset
 
-(Blank for now!)
+```{r crime-plots, fig.width = 10, fig.height= 5}
+
+p1 <- assault %>%
+  group_by(Year, Region) %>%
+  summarise(
+    means = mean(as.numeric(Rate), na.rm = TRUE)
+  ) %>%
+  ggplot() +
+    geom_col(aes(x = Year, y = means, fill = means)) +
+  theme_proj +
+  scale_fill_viridis_c(option = "B", direction = -1) +
+  guides(fill = FALSE) +
+  labs(x = element_blank(), y = "Mean Rate per 100,000 population",
+       title = "Assault") +
+  theme(plot.title = element_text(size = 8)) +
+  theme(axis.text.x = element_text(size = 3, angle = 45, vjust = .1, hjust=.1)) +
+  facet_grid(. ~ Region)
+
+p2 <- robbery %>%
+  group_by(Year, Region) %>%
+  summarise(
+    means = mean(as.numeric(Rate), na.rm = TRUE)
+  ) %>%
+  ggplot() +
+    geom_col(aes(x = Year, y = means, fill = means)) +
+  theme_proj +
+  scale_fill_viridis_c(option = "B", direction = -1) +
+  guides(fill = FALSE) +
+  labs(x = "Year", y = element_blank(),
+       title = "Robbery") +
+  theme(plot.title = element_text(size = 8)) +
+  theme(axis.text.x = element_text(size = 3, angle = 45, vjust = .1, hjust=.1)) +
+  facet_grid(. ~ Region)
+
+p3 <- sexualviolence %>%
+  group_by(Year, Region) %>%
+  summarise(
+    means = mean(as.numeric(Rate), na.rm = TRUE)
+  ) %>%
+  ggplot() +
+    geom_col(aes(x = Year, y = means, fill = means)) +
+  theme_proj +
+  scale_fill_viridis_c(option = "B", direction = -1) +
+  guides(fill = FALSE) +
+  labs(x = element_blank(), y = element_blank(),
+       title = "Sexual Violence",
+       caption = "Source: UNODC Sexual Violence Crime Data") +
+  theme(plot.title = element_text(size = 8), 
+        axis.text.x = element_text(size = 3, angle = 45, vjust = .1, hjust=.1)) +
+  facet_grid(. ~ Region)
+
+p1 + p2 + p3
+```
 
 ---
 # Crime & Happiness Over Time
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
+```{r happy-time, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
 ggplot(data = happiness) +
   geom_point(mapping = aes(x = year, y = mean)) +
   geom_line(mapping = aes(x = year, y = mean)) +
@@ -267,7 +355,7 @@ ggplot(data = happiness) +
 ---
 # Comparisons
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
+```{r happy-cor, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
 spotify_by_year_small <- spotify_by_year %>% filter(year == 2015 | year == 2016 | year == 2017 | year == 2018 | year == 2019 | year == 2020)
 
 spotify_and_happiness <- left_join(spotify_by_year_small, happiness, by = c("year" = "year"))
