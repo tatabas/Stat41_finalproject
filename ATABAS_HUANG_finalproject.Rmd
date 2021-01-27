@@ -20,8 +20,9 @@ library(readr)
 
 ```{r plot themes}
 theme_proj = theme_minimal(base_family = "Palatino") + 
-  theme(plot.title.position = "plot",
-        plot.background = element_rect(fill = "#FEF5D1"))
+  theme(plot.title.position = "plot")
+
+#plot.background = element_rect(fill = "#FEF5D1")
 ```
 
 # Introduction
@@ -64,6 +65,17 @@ In addition to a study of trends in music consumption, this study aims to take a
 # Data
 
 The datasets used in this project required lots of work to clean and prepare for visualization and analysis. The data cleaning and code is outlines in the [ATABAS_HUANG_dataCleaning.Rmd file](https://github.com/tatabas/Stat41_finalproject), with short descriptions attached for each cleaning procedure.
+
+```{r loading data}
+#data is cleaned in ATABAS_HUANG_dataCleaning.Rmd and loaded here
+spotify <- read.csv("data/data.csv")
+spotify_by_year <- read.csv("data/data_by_year.csv")
+happiness <- read.csv("data/happiness.csv")
+robbery <- read.csv("data/robbery.csv")
+assault <- read.csv("data/assault.csv")
+sexualviolence <- read.csv("data/sexualviolence.csv")
+all_together <- read.csv("data/alltogether.csv")
+```
 
 **Music:**
 The music dataset is made available through the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). Spotify is an audio streaming service that was launched in 2008 and is now one of the most popular streaming platforms for music and podcasts. Therefore, the dataset is fairly comprehensive and contains lots of  information due to Spotify’s status as one of the most popular sites for music consumption. 
@@ -214,17 +226,6 @@ server <- function(input, output) {
 shinyApp(ui, server, options = list(height = 500))
 ```
 
-```{r}
-  ggplot(data = spotify_by_year,aes(x = acousticness, y = valence)) + 
-              geom_point()+
-          theme_proj +
-          #need to add gridlines because tufte removes them
-          theme(panel.grid.major = element_line(color = "gray90"),
-                panel.grid.minor = element_line(color = "gray90"),
-                legend.position = "none") 
-          
-```
-
 ## Happiness
 
 Before we begin combining the Spotify dataset with other datasets, it's important to look at those datasets individually. For example, how does the World Happiness dataset change over each year? The world map below, in Figure \@ref(fig:plotlyhappiness), is an interactive map that displays the change in world happiness in countries over the years from $2015$ to $2020$. (Hover over countries to see more specific information.)
@@ -282,8 +283,8 @@ The world map above, in Figure \@ref(fig:plotlyhappiness), is an interactive map
 library(ggridges)
 ggplot(happiness, aes(y = Region, x = Happiness.Score, fill = Region)) + 
   geom_density_ridges(alpha = .8) +
-  scale_fill_viridis_d(end = .75, option = "C") + 
-  scale_color_viridis_d(end = .75, option = "C") + 
+  scale_fill_viridis_d(end = .75, option = "B") + 
+  scale_color_viridis_d(end = .75, option = "B") + 
   theme_proj +
   theme(legend.position = "none") +
   labs(title = "Happiness Score of Each Region",
@@ -331,8 +332,15 @@ ui <- fluidPage(
         # Inputs: Select variables to plot
         sidebarPanel(
             
+            selectInput(inputId = "crime",
+                        label = "Type of Crime: ",
+                        choices = c("Assault" = "assault", 
+                                    "Robbery" = "robbery", "Sexual Violence" = "sexualviolence"),
+                        selected = "assault",
+                        multiple = FALSE),
+          
             # Select variable for location
-            selectInput(inputId = "region", 
+            selectInput(inputId = "reg", 
                         label = "Region:",
                         choices = regions, 
                         selected = "Africa",
@@ -357,11 +365,15 @@ ui <- fluidPage(
 server <- function(input, output) {
     
     output$sub <- renderUI({
-        this_region <- assault %>%
-            filter(Region == input$region)
+        req(input$reg)
+        this_region <- if(input$crime == "assault"){assault %>% filter(Region == input$reg)}
+                        else if (input$crime == "robbery"){robbery %>% filter(Region == input$reg)}
+                        else {sexualviolence %>% filter(Region == input$reg)} 
+        
         sub_this_location <- sort(unique(this_region$Subregion))
         
-        selectInput(inputId = "sub", label = "Sub Region:", choices = sub_this_location, selected = "Eastern Africa")
+        selectInput(inputId = "sub", label = "Sub Region:", choices = sub_this_location, 
+                    selected = "Middle Africa", multiple = FALSE)
     })
     
     # Creates plot object the plotOutput function is expecting
@@ -369,7 +381,7 @@ server <- function(input, output) {
         
         #Creates base plot 
         
-        Region_of_Interest = input$region
+        Region_of_Interest = input$reg
         Sub_of_Interest = input$sub
         
         plot_data <- assault %>% 
@@ -420,7 +432,7 @@ p1 <- assault %>%
   ggplot() +
     geom_col(aes(x = Year, y = means, fill = means)) +
   theme_proj +
-  scale_fill_distiller(palette = "YlOrRd", direction = 1) +
+  scale_fill_viridis_c(option = "B", direction = -1) +
   guides(fill = FALSE) +
   labs(x = "Year", y = "Mean Rate per 100,000 population",
        title = "Mean Rate of Assault per 100,000 population by Year",
@@ -437,7 +449,7 @@ p2 <- robbery %>%
   ggplot() +
     geom_col(aes(x = Year, y = means, fill = means)) +
   theme_proj +
-  scale_fill_distiller(palette = "YlOrRd", direction = 1) +
+  scale_fill_viridis_c(option = "B", direction = -1) +
   guides(fill = FALSE) +
   labs(x = "Year", y = element_blank(),
        title = "Mean Rate of Robbery per 100,000 population by Year",
@@ -454,7 +466,7 @@ p3 <- sexualviolence %>%
   ggplot() +
     geom_col(aes(x = Year, y = means, fill = means)) +
   theme_proj +
-  scale_fill_distiller(palette = "YlOrRd", direction = 1) +
+  scale_fill_viridis_c(option = "B", direction = -1) +
   guides(fill = FALSE) +
   labs(x = "Year", y = element_blank(),
        title = "Mean Rate of Sexual Violence per 100,000 population by Year",
@@ -491,7 +503,8 @@ ggplot(data = spotify_by_year_small) +
 spotify_and_happiness <- left_join(spotify_by_year_small, happiness, by = c("year" = "year"))
 ggplot(data = spotify_and_happiness) +
   geom_point(mapping = aes(x = valence, y = mean)) +
-  geom_smooth(mapping = aes(x = valence, y = mean), method = "lm", se = FALSE)
+  geom_smooth(mapping = aes(x = valence, y = mean), method = "lm", se = FALSE) +
+  theme_proj
 ```
 
 ```{r}
@@ -503,17 +516,21 @@ summary(spotify_happiness_lm)
 
 ## Crime and Explicitness
 
-```{r regress-assault, fig.cap="Comparing rate and percent explicit music per year for 2010-2017, displayed by region for each type of crime: assault, robbery, and sexual violence"}
+```{r regress-assault, fig.cap="Comparing rate of crime (for 100,000 population) and percent explicit music per year for 2010-2017, displayed by region for each type of crime: assault, robbery, and sexual violence"}
 all_together %>%
   ggplot(aes(x = Rate, y = perc_expl, color = year)) +
-    geom_point(size = 0.3, alpha = 0.6) +
+    geom_jitter(size = 0.3, alpha = 0.6) +
     geom_smooth(
     method = "glm", method.args = list(family = "binomial"), 
-    color = "dodgerblue", se = FALSE, size = 1
+    color = "#2E2927", se = FALSE, size = 1
     ) +
-    scale_color_distiller(palette = "YlOrRd", direction = 1) +
-    facet_grid(type ~ Region, scale = "free") +
-    labs(y = "% Explicit Music", color = "Year", caption = "Source: UNODC Crime Data and Spotify API") +
+    scale_color_viridis_c(option = "B", direction = -1) +
+    #scale_color_distiller(palette = "YlOrRd", direction = 1) +
+    facet_grid(type ~ ., scale = "free_x") +
+    labs(x = "Log Rate of Crime", y = "% Explicit Music", 
+         color = "Year", caption = "Source: UNODC Crime Data and Spotify API",
+         title = "Crime Rates and Explicit Music") +
+    scale_x_log10() +
     theme_proj
 ```
 
