@@ -97,6 +97,11 @@ library(maps)
 library(plotly)
 library(readr)
 library(ggridges)
+#library(xaringanthemer)
+
+#style_mono_accent(
+  #base_color = "#43418A"
+#)
 
 theme_proj = theme_minimal() + 
   theme(plot.title.position = "plot")
@@ -113,8 +118,7 @@ all_together <- read.csv("data/alltogether.csv")
 
 ```
 
-```{r scatter, fig.height = 3, fig.width = 4, dpi = 150}
-spotify_by_year <- read_csv("data/data_by_year.csv")
+```{r scatter, out.width="70%", dpi = 150, include = FALSE}
 ggplot(data = spotify_by_year) +
   geom_point(mapping = aes(x = year, y = valence)) +
   labs(title = "Happiness of Music Over Time",
@@ -124,12 +128,13 @@ ggplot(data = spotify_by_year) +
   theme_proj 
 ```
 
+```{r, out.width="85%"}
+knitr::include_graphics("images/happy_scatter.png")
+```
 ---
 # Exploring Happiness Dataset
 
-```{r happy-map, echo = FALSE, message = FALSE, warning = FALSE}
-#loading dataset of each country's ISO code (because plotly needs it to map countries)
-# source: https://www.kaggle.com/andradaolteanu/iso-country-codes-global
+```{r happy-load}
 country_code <- read_csv("data/wikipedia-iso-country-codes.csv")
 happiness_2015 <- read.csv("data/2015.csv") %>% mutate(year = 2015)
 happiness_2016 <- read.csv("data/2016.csv") %>% mutate(year = 2016)
@@ -179,51 +184,8 @@ happiness_2020 <- happiness_2020 %>% mutate(mean = mean(Happiness.Score))
 
 happiness <- happiness_2015 %>% bind_rows(happiness_2016) %>% bind_rows(happiness_2017) %>%
   bind_rows(happiness_2018) %>% bind_rows(happiness_2019) %>% bind_rows(happiness_2020)
-
-#joining together happiness and country_code dataset
-happiness_plotly <- left_join(country_code, happiness, by = c("English short name lower case" = "Country"))
-
-#renaming the happiness dataset variables
-colnames(happiness_plotly) = c("Country", "two.code", "three.code", "Numeric.code", "ISO",
-                        "Region", "Happiness.Rank", "Happiness.Score", "Standard.Error",
-                        "Economy..GDP.per.Capita.", "Family", "Health..Life.Expectancy.",
-                        "Freedom", "Trust..Government.Corruption.", "Generosity",
-                        "Dystopia.Residual", "year", "mean", "Lower.Confidence.Interval",
-                        "Upper.Confidence.Interval", "Logged.GDP.per.capita",
-                        "Healthy.life.expectancy", "Ladder.score.in.Dystopia",
-                        "Explained.by..Log.GDP.per.capita", "Explained.by..Social.support",
-                        "Explained.by..Healthy.life.expectancy",
-                        "Explained.by..Freedom.to.make.life.choices",
-                        "Explained.by..Generosity",
-                        "Explained.by..Perceptions.of.corruption")
-
-#"hover" variable: this specifies what info is displayed when you hover over a country
-happiness_plotly <- happiness_plotly %>% mutate(hover = paste0(Country, "\nHappiness Rank: ", Happiness.Rank, "\nHappiness Score: ", Happiness.Score))
-
-#hover label aesthetics
-fontStyle <- list(family = "Arial", size = 15, color = "black")
-label <- list(bgcolor = "#EEEEEE", bordercolor = "transparent", font = fontStyle)
-
-#plotly map!
-p1 <- plot_geo(happiness_plotly, locationmode = "world", frame = ~year) %>%
-  add_trace(locations = ~three.code,
-            z = ~Happiness.Score,
-            zmin = 2,
-            zmax = 8,
-            color = ~Happiness.Score,
-            colorscale = "Electric", #changes color of scale (other options: RdBu, Viridis, Rainbow)
-            text = ~hover, #displays info in "hover" variable we made above
-            hoverinfo = "text") %>% #makes hover info the text from above line
-  layout(font = list(family = "Arial"), title = "World Happiness Report \n 2015 - 2020") %>%
-  style(hoverlabel = label) %>%
-  config(displayModeBar = FALSE) #hides the plotly toolbar in top right
-
-p1
-
-# credit to this tutorial: https://www.youtube.com/watch?v=RrtqBYLf404
 ```
-
-```{r happy-ridges, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
+```{r happy-ridges, fig.height = 3, fig.width = 4, dpi = 150, include= FALSE}
 library(patchwork)
 #happiness_ridges <- happiness %>% filter(year == 2015 | year == 2016 | year == 2020)
 happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(5, 1), ])
@@ -274,11 +236,63 @@ plot2 <- ggplot(happiness_2020, aes(y = Region, x = Happiness.Score, fill = Regi
 
 plot0 + plot1 + plot2
 ```
+```{r, out.width="85%"}
+knitr::include_graphics("images/happiness_ridges")
+```
+
+---
+
+```{r happy-map, out.width = "100%"}
+#loading dataset of each country's ISO code (because plotly needs it to map countries)
+# source: https://www.kaggle.com/andradaolteanu/iso-country-codes-global
+
+#joining together happiness and country_code dataset
+happiness_plotly <- left_join(country_code, happiness, by = c("English short name lower case" = "Country"))
+
+#renaming the happiness dataset variables
+colnames(happiness_plotly) = c("Country", "two.code", "three.code", "Numeric.code", "ISO",
+                        "Region", "Happiness.Rank", "Happiness.Score", "Standard.Error",
+                        "Economy..GDP.per.Capita.", "Family", "Health..Life.Expectancy.",
+                        "Freedom", "Trust..Government.Corruption.", "Generosity",
+                        "Dystopia.Residual", "year", "mean", "Lower.Confidence.Interval",
+                        "Upper.Confidence.Interval", "Logged.GDP.per.capita",
+                        "Healthy.life.expectancy", "Ladder.score.in.Dystopia",
+                        "Explained.by..Log.GDP.per.capita", "Explained.by..Social.support",
+                        "Explained.by..Healthy.life.expectancy",
+                        "Explained.by..Freedom.to.make.life.choices",
+                        "Explained.by..Generosity",
+                        "Explained.by..Perceptions.of.corruption")
+
+#"hover" variable: this specifies what info is displayed when you hover over a country
+happiness_plotly <- happiness_plotly %>% mutate(hover = paste0(Country, "\nHappiness Rank: ", Happiness.Rank, "\nHappiness Score: ", Happiness.Score))
+
+#hover label aesthetics
+fontStyle <- list(family = "Arial", size = 15, color = "black")
+label <- list(bgcolor = "#EEEEEE", bordercolor = "transparent", font = fontStyle)
+
+#plotly map!
+p1 <- plot_geo(happiness_plotly, locationmode = "world", frame = ~year) %>%
+  add_trace(locations = ~three.code,
+            z = ~Happiness.Score,
+            zmin = 2,
+            zmax = 8,
+            color = ~Happiness.Score,
+            colorscale = "Electric", #changes color of scale (other options: RdBu, Viridis, Rainbow)
+            text = ~hover, #displays info in "hover" variable we made above
+            hoverinfo = "text") %>% #makes hover info the text from above line
+  layout(font = list(family = "Arial"), title = "World Happiness Report \n 2015 - 2020") %>%
+  style(hoverlabel = label) #%>%
+  #config(displayModeBar = FALSE) #hides the plotly toolbar in top right
+
+p1
+
+# credit to this tutorial: https://www.youtube.com/watch?v=RrtqBYLf404
+```
 
 ---
 # Exploring Crime Dataset
 
-```{r crime-plots, fig.width = 10, fig.height= 5}
+```{r crime-plots, fig.width = 4, dpi = 150, include = FALSE}
 
 p1 <- assault %>%
   group_by(Year, Region) %>%
@@ -288,12 +302,13 @@ p1 <- assault %>%
   ggplot() +
     geom_col(aes(x = Year, y = means, fill = means)) +
   theme_proj +
-  scale_fill_viridis_c(option = "B", direction = -1) +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1) +
+  #scale_fill_viridis_c(option = "B", direction = -1) +
   guides(fill = FALSE) +
   labs(x = element_blank(), y = "Mean Rate per 100,000 population",
        title = "Assault") +
   theme(plot.title = element_text(size = 8)) +
-  theme(axis.text.x = element_text(size = 3, angle = 45, vjust = .1, hjust=.1)) +
+  theme(axis.text.x = element_text(size = 8, angle = 45, vjust = .1, hjust=.1)) +
   facet_grid(. ~ Region)
 
 p2 <- robbery %>%
@@ -304,12 +319,13 @@ p2 <- robbery %>%
   ggplot() +
     geom_col(aes(x = Year, y = means, fill = means)) +
   theme_proj +
-  scale_fill_viridis_c(option = "B", direction = -1) +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1) +
+  #scale_fill_viridis_c(option = "B", direction = -1) +
   guides(fill = FALSE) +
   labs(x = "Year", y = element_blank(),
        title = "Robbery") +
   theme(plot.title = element_text(size = 8)) +
-  theme(axis.text.x = element_text(size = 3, angle = 45, vjust = .1, hjust=.1)) +
+  theme(axis.text.x = element_text(size = 8, angle = 45, vjust = .1, hjust=.1)) +
   facet_grid(. ~ Region)
 
 p3 <- sexualviolence %>%
@@ -320,22 +336,25 @@ p3 <- sexualviolence %>%
   ggplot() +
     geom_col(aes(x = Year, y = means, fill = means)) +
   theme_proj +
-  scale_fill_viridis_c(option = "B", direction = -1) +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1) +
+  #scale_fill_viridis_c(option = "B", direction = -1) +
   guides(fill = FALSE) +
   labs(x = element_blank(), y = element_blank(),
        title = "Sexual Violence",
        caption = "Source: UNODC Sexual Violence Crime Data") +
   theme(plot.title = element_text(size = 8), 
-        axis.text.x = element_text(size = 3, angle = 45, vjust = .1, hjust=.1)) +
+        axis.text.x = element_text(size = 8, angle = 45, vjust = .1, hjust=.1)) +
   facet_grid(. ~ Region)
 
 p1 + p2 + p3
 ```
-
+```{r, out.width = "100%"}
+knitr::include_graphics("images/crime_rates.png")
+```
 ---
-# Crime & Happiness Over Time
+# Happiness Over Time
 
-```{r happy-time, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
+```{r happy-time, out.width = "70%", include = FALSE}
 ggplot(data = happiness) +
   geom_point(mapping = aes(x = year, y = mean)) +
   geom_line(mapping = aes(x = year, y = mean)) +
@@ -349,26 +368,69 @@ ggplot(data = happiness) +
   theme(panel.grid.major = element_line(color = "gray90"),
         panel.grid.minor = element_line(color = "gray90"))
 ```
-
-(Insert crime plots here?)
+```{r, out.width = "90%"}
+knitr::include_graphics("images/happy_time")
+```
 
 ---
 # Comparisons
 
-```{r happy-cor, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 3, fig.width = 4, dpi = 150}
+```{r happy-cor, out.width = "70%", dpi = 150, include = FALSE}
 spotify_by_year_small <- spotify_by_year %>% filter(year == 2015 | year == 2016 | year == 2017 | year == 2018 | year == 2019 | year == 2020)
 
 spotify_and_happiness <- left_join(spotify_by_year_small, happiness, by = c("year" = "year"))
-ggplot(data = spotify_and_happiness) +
-  geom_point(mapping = aes(x = valence, y = mean)) +
-  theme_proj +
-  #need to add gridlines because tufte removes them
-  theme(panel.grid.major = element_line(color = "gray90"),
-        panel.grid.minor = element_line(color = "gray90"))
+
+#spotify_and_happiness 
+
+ggplot(data = spotify_and_happiness, aes(x = as.factor(round(valence,4)), y = Happiness.Score)) +
+  geom_jitter() +
+  geom_boxplot(alpha= 0.3, aes(fill = year)) +
+  scale_fill_viridis_c(option = "B") +
+  guides(fill = FALSE) +
+  labs(x = "Yearly Average Valence", y = "Happiness Score",
+       title = "Yearly Average Valence and World Happiness Scores") +
+  theme_proj
+```
+```{r, out.width = "90%"}
+knitr::include_graphics("images/happy_box")
 ```
 
-(Insert crime & music comparison plot here)
+---
+# Crime and Explicit Music
+
+```{r regress-assault, out.width="70%", dpi = 150,include = FALSE}
+all_together %>%
+  ggplot(aes(x = Rate, y = perc_expl, color = year)) +
+    geom_jitter(size = 0.3, alpha = 0.6) +
+    geom_smooth(
+    method = "glm", method.args = list(family = "binomial"), 
+    color = "#2E2927", se = FALSE, size = 1
+    ) +
+    scale_color_viridis_c(option = "B", direction = -1) +
+    #scale_color_distiller(palette = "YlOrRd", direction = 1) +
+    facet_grid(type ~ ., scale = "free_x") +
+    labs(x = "Log Rate of Crime", y = "% Explicit Music", 
+         color = "Year", caption = "Source: UNODC Crime Data and Spotify API",
+         title = "Crime Rates and Explicit Music") +
+    scale_x_log10() +
+    theme_proj
+```
+```{r, out.width = "90%"}
+knitr::include_graphics("images/crime_reg")
+```
 
 ---
 # Discussion
+
+Limitations:
++ Limited data available 
++ Correlational study
++ Merging the datasets (no independence)
+
+Future Works/Discussion:
++ Exploring more of the music variables
++ Predicting the next popular song
++ Finding crime data for U.S. only
+
+
 
