@@ -11,18 +11,6 @@ output:
       countIncrementalSlides: false
 ---
 
-# Xaringan presentation
-
-(Need to install the `xaringan` package)
-
-+ [About](https://bookdown.org/yihui/rmarkdown/xaringan.html)
-+ [Themes here](https://github.com/yihui/xaringan/wiki/Themes)
-+ Want to get fancy with a custom theme? Try [xaringan themer](https://pkg.garrickadenbuie.com/xaringanthemer/articles/xaringanthemer.html)
-+ Style edits: google "how to ______ in xaringan"
-
-**Difference:** slides are broken up with `---`
-
----
 # Introduction
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/rnUSNbqtVJI" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -47,7 +35,7 @@ Music has strong effects on the brain, specifically on: memory, movement, and em
 | tempo            | num  | overall estimated tempo of a track in beats per minute              | 124.2831   |
 | valence          | num  | describes the musical positiveness conveyed by a track              | 0.5010478  |
 | popularity       | num  | popularity                                                          | 64.3019704 |
-| key              | int  | key track is in                                                     | 1          |
+| explicitness              | int  | whether track contains explicit content (1) or not (0)                                                     | 1          |
 
 ---
 # World Happiness Dataset
@@ -65,7 +53,7 @@ Music has strong effects on the brain, specifically on: memory, movement, and em
 | Freedom                       | num  | freedom to make life choices                                                                           | 0.66557        |
 | Trust..Government.Corruption. | num  | perceptions of corruption                                                                              | 0.41978        |
 | Generosity                    | num  | generosity of people in the country                                                                    | 0.29678        |
-| Dystopia.Residual             | num  | relative to a hypothetical country called “Dystopia” (with lowest national averages of previous years) | 2.51738        |
+| Dystopia.Residual             | num  | relative to a hypothetical country called “Dystopia” (lowest national averages of previous years) | 2.51738        |
 | year                          | int  | year                                                                                                   | 2015           |
 | mean                          | num  | average happiness score                                                                                | 5.375734       |
 
@@ -84,7 +72,6 @@ There are separate datasets for Assault, Robbery and Sexual Violence. All follow
 | Year      | int  | Year                                 | 2010        |
 
 ---
-# Exploring Spotify Dataset
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
@@ -118,23 +105,9 @@ all_together <- read.csv("data/alltogether.csv")
 
 ```
 
-```{r scatter, out.width="70%", dpi = 150, include = FALSE}
-ggplot(data = spotify_by_year) +
-  geom_point(mapping = aes(x = year, y = valence)) +
-  labs(title = "Happiness of Music Over Time",
-       x = "Year",
-       y = "Valence (0 to 1)",
-       caption = "SOURCE: Spotify") +
-  theme_proj 
-```
-
-```{r, out.width="85%"}
-knitr::include_graphics("images/happy_scatter.png")
-```
----
-# Exploring Happiness Dataset
-
-```{r happy-load}
+```{r happy-map, out.width = "100%"}
+#loading dataset of each country's ISO code (because plotly needs it to map countries)
+# source: https://www.kaggle.com/andradaolteanu/iso-country-codes-global
 country_code <- read_csv("data/wikipedia-iso-country-codes.csv")
 happiness_2015 <- read.csv("data/2015.csv") %>% mutate(year = 2015)
 happiness_2016 <- read.csv("data/2016.csv") %>% mutate(year = 2016)
@@ -142,23 +115,19 @@ happiness_2017 <- read.csv("data/2017.csv") %>% mutate(year = 2017)
 happiness_2018 <- read.csv("data/2018.csv") %>% mutate(year = 2018)
 happiness_2019 <- read.csv("data/2019.csv") %>% mutate(year = 2019)
 happiness_2020 <- read.csv("data/2020.csv") %>% mutate(year = 2020)
-
 colnames(happiness_2017) = c("Country", "Happiness.Rank", "Happiness.Score",
                              "Upper.Confidence.Interval", "Lower.Confidence.Interval",
                              "Economy..GDP.per.Capita.", "Family", "Health..Life.Expectancy.",
                              "Freedom", "Generosity", "Trust..Government.Corruption.",
                              "Dystopia.Residual", "year")
-
 colnames(happiness_2018) = c("Happiness.Rank", "Country", "Happiness.Score",
                              "Economy..GDP.per.Capita.", "Family", "Health..Life.Expectancy.",
                              "Freedom", "Generosity", "Trust..Government.Corruption.",
                              "year")
-
 colnames(happiness_2019) = c("Happiness.Rank", "Country", "Happiness.Score",
                              "Economy..GDP.per.Capita.", "Family", "Health..Life.Expectancy.",
                              "Freedom", "Generosity", "Trust..Government.Corruption.",
                              "year")
-
 colnames(happiness_2020) = c("Country", "Region", "Happiness.Score", "Standard.Error",
                              "Upper.Confidence.Interval", "Lower.Confidence.Interval",
                              "Logged.GDP.per.capita", "Family", "Healthy.life.expectancy",
@@ -170,81 +139,17 @@ colnames(happiness_2020) = c("Country", "Region", "Happiness.Score", "Standard.E
                              "Explained.by..Generosity",
                              "Explained.by..Perceptions.of.corruption",
                              "Dystopia.Residual", "year")
-
 happiness_2018 <- happiness_2018[-20,]
 happiness_2018 <- happiness_2018 %>% mutate(Trust..Government.Corruption. =
                                               as.numeric(Trust..Government.Corruption.))
-
 happiness_2015 <- happiness_2015 %>% mutate(mean = mean(Happiness.Score))
 happiness_2016 <- happiness_2016 %>% mutate(mean = mean(Happiness.Score))
 happiness_2017 <- happiness_2017 %>% mutate(mean = mean(Happiness.Score))
 happiness_2018 <- happiness_2018 %>% mutate(mean = mean(Happiness.Score))
 happiness_2019 <- happiness_2019 %>% mutate(mean = mean(Happiness.Score))
 happiness_2020 <- happiness_2020 %>% mutate(mean = mean(Happiness.Score))
-
 happiness <- happiness_2015 %>% bind_rows(happiness_2016) %>% bind_rows(happiness_2017) %>%
   bind_rows(happiness_2018) %>% bind_rows(happiness_2019) %>% bind_rows(happiness_2020)
-```
-```{r happy-ridges, fig.height = 3, fig.width = 4, dpi = 150, include= FALSE}
-library(patchwork)
-#happiness_ridges <- happiness %>% filter(year == 2015 | year == 2016 | year == 2020)
-happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(5, 1), ])
-happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(15, 1), ])
-happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(9, 1), ])
-happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(10, 1), ])
-
-happiness_2016 <- rbind(happiness_2016, happiness_2016[rep(6, 1), ])
-happiness_2016 <- rbind(happiness_2016, happiness_2016[rep(13, 1), ])
-happiness_2016 <- rbind(happiness_2016, happiness_2016[rep(8, 1), ])
-happiness_2016 <- rbind(happiness_2016, happiness_2016[rep(9, 1), ])
-  
-plot0 <- ggplot(happiness_2015, aes(y = Region, x = Happiness.Score, fill = Region)) + 
-  geom_density_ridges(alpha = .8) +
-  scale_fill_viridis_d(end = .75, option = "B") + 
-  scale_color_viridis_d(end = .75, option = "B") + 
-  theme_proj +
-  theme(legend.position = "none",
-        plot.subtitle = element_text(hjust = 1)) +
-  labs(title = "Happiness Score of Each Region",
-       subtitle = "2015",
-       y = "Region",
-       x = element_blank())
-
-plot1 <- ggplot(happiness_2016, aes(y = Region, x = Happiness.Score, fill = Region)) +
-  geom_density_ridges(alpha = .8) +
-  scale_fill_viridis_d(end = .75, option = "B") +
-  scale_color_viridis_d(end = .75, option = "B") +
-  theme_proj +
-  theme(legend.position = "none",
-        axis.text.y = element_blank(),
-        plot.subtitle = element_text(hjust = 1)) +
-  labs(subtitle = "2016",
-       y = element_blank(), 
-       x ="Happiness Score")
-
-plot2 <- ggplot(happiness_2020, aes(y = Region, x = Happiness.Score, fill = Region)) +
-  geom_density_ridges(alpha = .8) +
-  scale_fill_viridis_d(end = .75, option = "B") +
-  scale_color_viridis_d(end = .75, option = "B") +
-  theme_proj +
-  theme(legend.position = "none",
-        plot.subtitle = element_text(hjust = 1))+
-  labs(subtitle = "2020",
-       caption = "SOURCE: World Happiness Report",
-       y = element_blank(), 
-       x = element_blank())
-
-plot0 + plot1 + plot2
-```
-```{r, out.width="85%"}
-knitr::include_graphics("images/happiness_ridges")
-```
-
----
-
-```{r happy-map, out.width = "100%"}
-#loading dataset of each country's ISO code (because plotly needs it to map countries)
-# source: https://www.kaggle.com/andradaolteanu/iso-country-codes-global
 
 #joining together happiness and country_code dataset
 happiness_plotly <- left_join(country_code, happiness, by = c("English short name lower case" = "Country"))
@@ -293,7 +198,7 @@ p1
 # Exploring Crime Dataset
 
 ```{r crime-plots, fig.width = 4, dpi = 150, include = FALSE}
-
+library(patchwork)
 p1 <- assault %>%
   group_by(Year, Region) %>%
   summarise(
@@ -351,48 +256,27 @@ p1 + p2 + p3
 ```{r, out.width = "100%"}
 knitr::include_graphics("images/crime_rates.png")
 ```
----
-# Happiness Over Time
-
-```{r happy-time, out.width = "70%", include = FALSE}
-ggplot(data = happiness) +
-  geom_point(mapping = aes(x = year, y = mean)) +
-  geom_line(mapping = aes(x = year, y = mean)) +
-  labs(title = "World Happiness Score Over Time",
-       subtitle = "average of every country's score each year",
-       x = "",
-       y = "Happiness Score",
-       caption = "SOURCE: World Happiness Report") +
-  theme_proj +
-  #need to add gridlines because tufte removes them
-  theme(panel.grid.major = element_line(color = "gray90"),
-        panel.grid.minor = element_line(color = "gray90"))
-```
-```{r, out.width = "90%"}
-knitr::include_graphics("images/happy_time")
-```
 
 ---
 # Comparisons
 
-```{r happy-cor, out.width = "70%", dpi = 150, include = FALSE}
+```{r happy-cor, out.height = "70%"}
 spotify_by_year_small <- spotify_by_year %>% filter(year == 2015 | year == 2016 | year == 2017 | year == 2018 | year == 2019 | year == 2020)
 
 spotify_and_happiness <- left_join(spotify_by_year_small, happiness, by = c("year" = "year"))
 
 #spotify_and_happiness 
 
-ggplot(data = spotify_and_happiness, aes(x = as.factor(round(valence,4)), y = Happiness.Score)) +
-  geom_jitter() +
-  geom_boxplot(alpha= 0.3, aes(fill = year)) +
+plot00 <- ggplot(data = spotify_and_happiness, aes(x = as.factor(round(valence,4)), y = Happiness.Score)) +
+  geom_jitter(mapping = aes(text = paste("Country: ", Country,"\n Happiness Score: ", Happiness.Score, "\n Year: ", year)), alpha = 0.5) +
+  geom_boxplot(alpha= 0.5, aes(fill = year)) +
   scale_fill_viridis_c(option = "B") +
   guides(fill = FALSE) +
   labs(x = "Yearly Average Valence", y = "Happiness Score",
        title = "Yearly Average Valence and World Happiness Scores") +
   theme_proj
-```
-```{r, out.width = "90%"}
-knitr::include_graphics("images/happy_box")
+
+ggplotly(plot00, tooltip = "text")
 ```
 
 ---
@@ -424,13 +308,11 @@ knitr::include_graphics("images/crime_reg")
 
 Limitations:
 + Limited data available 
-+ Correlational study
 + Merging the datasets (no independence)
 
 Future Works/Discussion:
 + Exploring more of the music variables
 + Predicting the next popular song
-+ Finding crime data for U.S. only
 
 
 
