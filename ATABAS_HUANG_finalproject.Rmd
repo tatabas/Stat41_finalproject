@@ -363,6 +363,23 @@ ui <- fluidPage(
 
 # Define server function --------------------------------------------
 server <- function(input, output) {
+  
+    type <- reactive({
+      req(input$crime)
+      if(input$crime == "assault"){assault}
+      else if (input$crime == "robbery"){robbery}
+      else {sexualviolence} 
+    })
+    
+    #output$sub <- renderUI({
+        #req(input$reg)
+        #this_region <- type
+        
+        #sub_this_location <- sort(unique(this_region$Subregion))
+        
+        #selectInput(inputId = "sub", label = "Sub Region:", choices = sub_this_location, 
+                    #selected = "Middle Africa", multiple = FALSE)
+    #})
     
     output$sub <- renderUI({
         req(input$reg)
@@ -384,7 +401,7 @@ server <- function(input, output) {
         Region_of_Interest = input$reg
         Sub_of_Interest = input$sub
         
-        plot_data <- assault %>% 
+        plot_data <- type() %>% 
             filter(Region == Region_of_Interest) %>%
             filter(Subregion == Sub_of_Interest) 
             
