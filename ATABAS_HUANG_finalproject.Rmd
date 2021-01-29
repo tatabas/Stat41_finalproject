@@ -16,6 +16,7 @@ library(dplyr)
 library(maps)
 library(plotly)
 library(readr)
+library(patchwork)
 ```
 
 ```{r plot themes}
@@ -23,6 +24,23 @@ theme_proj = theme_minimal(base_family = "Palatino") +
   theme(plot.title.position = "plot")
 
 #plot.background = element_rect(fill = "#FEF5D1")
+```
+
+```{r loading data}
+#data is cleaned in ATABAS_HUANG_dataCleaning.Rmd and loaded here
+spotify <- read.csv("data/data.csv")
+spotify_by_year <- read.csv("data/data_by_year.csv")
+happiness_2015 <- read.csv("data/2015.csv")
+happiness_2016 <- read.csv("data/2016.csv")
+happiness_2017 <- read.csv("data/2017.csv")
+happiness_2018 <- read.csv("data/2018.csv")
+happiness_2019 <- read.csv("data/2019.csv")
+happiness_2020 <- read.csv("data/2020.csv")
+happiness <- read.csv("data/happiness.csv")
+robbery <- read.csv("data/robbery.csv")
+assault <- read.csv("data/assault.csv")
+sexualviolence <- read.csv("data/sexualviolence.csv")
+all_together <- read.csv("data/alltogether.csv")
 ```
 
 # Introduction
@@ -46,16 +64,6 @@ Other trends in music, and art in general, can illuminate these trends. Seeing t
 Change in music is not limited to different life periods, but is also present in different phases in one’s life. For example, there is a popular practice for pregnant mothers to play classical music for their babies in hopes of making them more intelligent. In other phases of life, teens may be warned to stay away from certain genres of music because it will “rot their brains” or act as a bad influence. In either case, music enters our lives early. Many young musical prodigies are discovered because they begin reacting to music even before they are able to speak or walk.
 
 Our plan for this study relies on a comprehensive data set supplied by the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). This data encompasses many interesting variables, and there is much to experiment with. It provides a fertile ground for exploration into how music affects humans. Two variables specifically are eye-catching: valence, a measure of the happiness of a song, and explicitness, whether a song contains explicit lyrics or not. There are also variables regarding year published, popularity, acousticness, etc. There is a perceived trend that current music (2010-2020) is becoming more and more explicit and despairing. In fact, this can be seen in Figure \@ref(fig:scattervalyear) with a dip in valence after 1975. It may be possible to look at these different characteristics in acousticness, valence, and explicitness to create a model that predicts the popularity of music. 
-```{r loading data}
-#data is cleaned in ATABAS_HUANG_dataCleaning.Rmd and loaded here
-spotify <- read.csv("data/data.csv")
-spotify_by_year <- read.csv("data/data_by_year.csv")
-happiness <- read.csv("data/happiness.csv")
-robbery <- read.csv("data/robbery.csv")
-assault <- read.csv("data/assault.csv")
-sexualviolence <- read.csv("data/sexualviolence.csv")
-all_together <- read.csv("data/alltogether.csv")
-```
 
 ```{r scattervalyear,fig.width=5,fig.height=3,fig.cap="Scatterplot of Spotify's valence score by year"}
 
@@ -140,7 +148,6 @@ spotify_by_year %>%
         panel.grid.minor = element_blank()) +
   labs(caption = "Source: Spotify", title = "Pairs plot for music")
 ```
-
 
 By looking at the pairs plot, it is possible to see that acousticness and energy are inversely related, and pretty strong at that (refer to plot with Figure \@ref(fig:gally), r = -0.967***). There are many other relationships to explore later when building a model. However, another promising relationships is between the loudness and popularity parameters. The songs that are louder also have a tendancy to be more popular. 
 
@@ -232,9 +239,9 @@ shinyApp(ui, server, options = list(height = 500))
 
 ## Happiness
 
-Before we begin combining the Spotify dataset with other datasets, it's important to look at those datasets individually. For example, how does the World Happiness dataset change over each year? The world map below, in Figure \@ref(fig:plotlyhappiness), is an interactive map that displays the change in world happiness in countries over the years from $2015$ to $2020$. (Hover over countries to see more specific information.)
+Before we begin combining the Spotify dataset with other datasets, it's important to look at those datasets individually. For example, how does the World Happiness dataset change over each year?
 
-```{r plotlyhappiness, fig.cap="Map of World Happiness from 2015 - 2020"}
+```{r plotlyhappiness, fig.width = 7, fig.height= 5, fig.cap="Map of World Happiness from 2015 - 2020"}
 #loading dataset of each country's ISO code (because plotly needs it to map countries)
 # source: https://www.kaggle.com/andradaolteanu/iso-country-codes-global
 country_code <- read_csv("data/wikipedia-iso-country-codes.csv")
@@ -283,7 +290,7 @@ p1
 
 The world map above, in Figure \@ref(fig:plotlyhappiness), is an interactive map that displays the change in world happiness in countries over the years from $2015$ to $2020$. (Hover over countries to see more specific information.)
 
-```{r happiness-ridges, fig.cap = "Density Ridges Plot of Happiness by Region"}
+```{r happiness-ridges, fig.width = 7, fig.height= 5, fig.cap = "Density Ridges Plot of Happiness by Region"}
 library(ggridges)
 ggplot(happiness, aes(y = Region, x = Happiness.Score, fill = Region)) + 
   geom_density_ridges(alpha = .8) +
@@ -297,9 +304,58 @@ ggplot(happiness, aes(y = Region, x = Happiness.Score, fill = Region)) +
        caption = "Source: World Happiness Report")
 ```
 
-The plot above shows a density plot of the happiness scores across different regions of the world. Note that some countries are included twice (ex: in Southeastern Asia AND in South Asia), as well as the fact that $2017$, $2018$, and $2019$ do not split countries into regions, so the happiness score is not plotted for those years. We can see that the happiest regions appear to be North America and Australia and New Zealand.
+```{r happy-ridges, fig.width = 7, fig.height= 5,}
+happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(5, 1), ])
+happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(15, 1), ])
+happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(9, 1), ])
+happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(10, 1), ])
+happiness_2016 <- rbind(happiness_2016, happiness_2016[rep(6, 1), ])
+happiness_2016 <- rbind(happiness_2016, happiness_2016[rep(13, 1), ])
+happiness_2016 <- rbind(happiness_2016, happiness_2016[rep(8, 1), ])
+happiness_2016 <- rbind(happiness_2016, happiness_2016[rep(9, 1), ])
+  
+plot0 <- ggplot(happiness_2015, aes(y = Region, x = Happiness.Score, fill = Region)) + 
+  geom_density_ridges(alpha = .8) +
+  scale_fill_viridis_d(end = .75, option = "B") + 
+  scale_color_viridis_d(end = .75, option = "B") + 
+  theme_proj +
+  theme(legend.position = "none",
+        plot.subtitle = element_text(hjust = 1)) +
+  labs(title = "Happiness Score of Each Region",
+       subtitle = "2015",
+       y = "Region",
+       x = element_blank())
 
-```{r happiness-over-time, fig.cap="World Happiness from 2015 - 2020"}
+plot1 <- ggplot(happiness_2016, aes(y = Region, x = Happiness.Score, fill = Region)) +
+  geom_density_ridges(alpha = .8) +
+  scale_fill_viridis_d(end = .75, option = "B") +
+  scale_color_viridis_d(end = .75, option = "B") +
+  theme_proj +
+  theme(legend.position = "none",
+        axis.text.y = element_blank(),
+        plot.subtitle = element_text(hjust = 1)) +
+  labs(subtitle = "2016",
+       y = element_blank(), 
+       x ="Happiness Score")
+
+plot2 <- ggplot(happiness_2020, aes(y = Regional.indicator, x = Ladder.score, fill = Regional.indicator)) +
+  geom_density_ridges(alpha = .8) +
+  scale_fill_viridis_d(end = .75, option = "B") +
+  scale_color_viridis_d(end = .75, option = "B") +
+  theme_proj +
+  theme(legend.position = "none",
+        plot.subtitle = element_text(hjust = 1))+
+  labs(subtitle = "2020",
+       caption = "SOURCE: World Happiness Report",
+       y = element_blank(), 
+       x = element_blank())
+
+plot0 + plot1 + plot2
+```
+
+The plot above shows a density plot of the happiness scores across different regions of the world. Note that some countries are included twice (ex: in Southeastern Asia AND in South Asia), as well as the fact that $2017$, $2018$, and $2019$ do not split countries into regions, so the happiness score is not plotted for those years. The most noticeable trends are that Western Europe, North America, and Australia and New Zealand tend to have the highest happiness scores.
+
+```{r happiness-over-time, fig.width = 7, fig.height= 5, fig.cap="World Happiness from 2015 - 2020"}
 ggplot(data = happiness) +
   geom_point(mapping = aes(x = year, y = mean)) +
   geom_line(mapping = aes(x = year, y = mean)) +
@@ -321,7 +377,7 @@ Continuing with the exploration, it is time to look at the crime data. The crime
 
 By plotting each type of crime over the years and by the region in Figure \@ref(fig:robbery) it is possible to see that certain types of crime are more prevalent or less prevalent by region, and there are changes over the years. The changes over the years are present in some regions, but not in others. For example, Europe does not have much fluctuation in crime rates, whereas the Americas show a decline in Assault from 2010-2017. Additionally, Oceania is higher in Assault and Sexual Violence but lower in Robbery. 
 
-```{r robbery, fig.width = 9, fig.height= 3, fig.cap = "Rates of Crime by Year and Region"}
+```{r robbery, fig.width = 9, fig.height= 5, fig.cap = "Rates of Crime by Year and Region"}
 library(patchwork)
 
 p1 <- assault %>%
@@ -338,7 +394,8 @@ p1 <- assault %>%
   labs(x = element_blank(), y = "Mean Rate per 100,000 population",
        title = "Assault") +
   theme(plot.title = element_text(size = 8)) +
-  theme(axis.text.x = element_text(angle = 45, vjust = .1, hjust=.1)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = .1, hjust=.1),
+        axis.text.y = element_text(size = 6)) +
   facet_grid(. ~ Region)
 
 p2 <- robbery %>%
@@ -381,7 +438,7 @@ p1 + p2 + p3
 
 Looking at this data split by region allows for us to see that not every region is the same, and that there are different trends. However, this idea also exists in specific countries of a given region. When viewed as a whole as in Figure \@ref(fig:not-region), the global trends on assault and robbery do not have much of a change, but there is an increasing trend in sexual violence. It may be true that sexual violence is increasing, but it may also be true that it is getting reported more. This may be in changes with the laws, or re-classifying types of assaults as sexual violence. In any way, there is an increase in sexual violence crimes according to the UNODC data.
 
-```{r not-region, fig.width = 9, fig.height = 3, fig.cap = "Rates of Crime by Type and Year}
+```{r not-region, fig.width = 9, fig.height = 5, fig.cap ="Rates of Crime by Type and Year"}
 p1 <- assault %>%
   group_by(Year, Region) %>%
   summarise(
@@ -396,7 +453,8 @@ p1 <- assault %>%
   labs(x = element_blank(), y = "Mean Rate per 100,000 population",
        title = "Assault") +
   theme(plot.title = element_text(size = 10)) +
-  theme(axis.text.x = element_text(angle = 45, vjust = .1, hjust=.1))
+  theme(axis.text.x = element_text(angle = 45, vjust = .1, hjust=.1),
+        axis.text.y = element_text(size = 6))
 
 p2 <- robbery %>%
   group_by(Year, Region) %>%
@@ -569,7 +627,21 @@ ggplot(data = spotify_by_year_small) +
 
 (This is the same EDA graph from earlier, but we limited the years to just $2015$ to $2020$ because these are the only years available in our World Happiness dataset.)
 
-```{r happy-box, fig.width=5, fig.height=3, fig.cap="Box plot of valence scores overlayed with points from the dataset"}
+```{r happiness-valence-lm}
+spotify_and_happiness <- left_join(spotify_by_year_small, happiness, by = c("year" = "year"))
+ggplot(data = spotify_and_happiness) +
+  geom_point(mapping = aes(x = valence, y = mean)) +
+  #geom_smooth(mapping = aes(x = valence, y = mean), method = "lm", se = FALSE) +
+  theme_proj +
+  labs(title = "Relationship between Yearly Mean Valence and Mean World Happiness",
+       x = "yearly mean valence",
+       y = "mean happiness score",
+       caption = "SOURCE: World Happiness Report and Spotify")
+```
+
+In Figure \@ref(fig:happiness-valence-lm), the music and happiness datasets were combined. In doing so, this means that each country now has one valence value, and one (mean) happiness score. There does appear to be a trend here: as the valence score increases, the mean happiness score also increases. However, this is a slightly inaccurate representation of, at the very least, happiness score because each country has different happiness scores.
+
+```{r happy-box, fig.width=7, fig.height=5, fig.cap="Box plot of valence scores overlayed with points from the dataset"}
 spotify_by_year_small <- spotify_by_year %>% filter(year == 2015 | year == 2016 | year == 2017 | year == 2018 | year == 2019 | year == 2020)
 
 spotify_and_happiness <- left_join(spotify_by_year_small, happiness, by = c("year" = "year"))
@@ -588,26 +660,13 @@ plot00 <- ggplot(data = spotify_and_happiness, aes(x = as.factor(round(valence,4
 ggplotly(plot00, tooltip = "text")
 ```
 
-```{r happiness-valence-lm}
-spotify_and_happiness <- left_join(spotify_by_year_small, happiness, by = c("year" = "year"))
-ggplot(data = spotify_and_happiness) +
-  geom_point(mapping = aes(x = valence, y = mean)) +
-  geom_smooth(mapping = aes(x = valence, y = mean), method = "lm", se = FALSE) +
-  theme_proj
-```
-
-```{r}
-spotify_happiness_lm <- lm(mean ~ valence, data = spotify_and_happiness)
-summary(spotify_happiness_lm)
-```
-
-(We combined the Spotify and World Happiness datasets by year and fit a linear regression model. We didn't check the assumptions because there are only 6 points. This makes the two variables seem very highly correlated, when in reality, they may not be.)
+In Figure \@ref(fig:happy-box), each individual country's happiness score was plotted against a valence value with boxplots overlayed on top. The plot is interactive to display the country name, happiness score, and year of each point. Since the music dataset does not have a country variable, each year/country is still only associated with one valence value. Therefore, valence was treated as a categorical variable in the above plot in order to overlay the boxplots on top of the points, so the distance between the valence values are not proportionate. Though changes in the plot are very minute, it's visible to see in the last four boxplots that the median happiness score, as well as the 75th quantile, increases as the valence increases.
 
 ## Crime and Explicitness
 
 In Figure \@ref(fig:robbery), there was evidence that crime changed over time, even if there was only a slight change. Now, comes the question whether this change was also paired with the changes in explicit music over time. In order to start the comparison, the percent explicit music per year was calculated. This serves as a general indicator for how prevalent explicit music was in a year. Percent explicit music increases continually in the selected time frame from 2010 - 2017, as indicated by the darkening shade of the colors in Figure \@ref(fig:regress-assault) and the plot below (Figure \@ref(fig:barcrime).
 
-```{r barcrime, fig.height=3, fig.width=5, fig.cap="Percent changes in explicit and non-explicit music over time"}
+```{r barcrime, fig.height=5, fig.width=7, fig.cap="Percent changes in explicit and non-explicit music over time"}
 library(ggtext)
 spotify %>%
   mutate (
@@ -624,7 +683,7 @@ spotify %>%
 
 The reason for the unique spread of the data in the form of horizontal lines is due to the percent explicit scores. Each point on the plot is a country, and each country can have its own crime rate in a given year. However, every country in a given year would have the same percent explicit score since the music data is available on a whole and not on a country-by-country basis. For example, Burundi can have a crime rate different from Sudan in 2010, but they would both have the same percent explicit score.
 
-```{r regress-assault, fig.height=3, fig.width=5, fig.cap="Comparing rate of crime (for 100,000 population) and percent explicit music per year for 2010-2017, displayed by region for each type of crime: assault, robbery, and sexual violence"}
+```{r regress-assault, fig.height=5, fig.width=7, fig.cap="Comparing rate of crime (for 100,000 population) and percent explicit music per year for 2010-2017, displayed by region for each type of crime: assault, robbery, and sexual violence"}
 all_together %>%
   ggplot(aes(x = Rate, y = perc_expl, color = year)) +
     geom_jitter(size = 0.3, alpha = 0.6) +
@@ -663,3 +722,4 @@ Explicit music, on the other hand, is definitely on the rise. We were interested
 It may seem spurious to correlate music and crime. As always, corellation is not causation, but it is important to understand that music is a form of art, and societal tendencies can be expressed in the art of its time. As artists and people reflect on what is going on around them, they will produce or consume different types of music that may resonate with them and the current state of society at the time.
 
 We used these three datasets to explore any trends, comparisons, and visualizations that may have meaning and insight. Lots of our visualizations have insights on how each set changed over time, and how these changes reflect between the datasets. 
+
