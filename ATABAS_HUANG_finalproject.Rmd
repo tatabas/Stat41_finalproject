@@ -605,11 +605,26 @@ summary(spotify_happiness_lm)
 
 ## Crime and Explicitness
 
-In Figure \@ref(fig:robbery), there was evidence that crime changed over time, even if there was only a slight change. Now, comes the question whether this change was also paired with the changes in explicit music over time. In order to start the comparison, the percent explicit music per year was calculated. This serves as a general indicator for how prevalent explicit music was in a year. Percent explicit music increases continually in the selected time frame from 2010 - 2017, as indicated by the darkening shade of the colors in Figure \@ref(fig:regress-assault).
+In Figure \@ref(fig:robbery), there was evidence that crime changed over time, even if there was only a slight change. Now, comes the question whether this change was also paired with the changes in explicit music over time. In order to start the comparison, the percent explicit music per year was calculated. This serves as a general indicator for how prevalent explicit music was in a year. Percent explicit music increases continually in the selected time frame from 2010 - 2017, as indicated by the darkening shade of the colors in Figure \@ref(fig:regress-assault) and the plot below (Figure \@ref(fig:barcrime).
+
+```{r barcrime, fig.height=3, fig.width=5, fig.cap="Percent changes in explicit and non-explicit music over time"}
+library(ggtext)
+spotify %>%
+  mutate (
+    new = ifelse(explicit == 1, "Explicit", "Not Explicit")
+  ) %>%
+  ggplot() +
+  geom_bar(aes(x = year, fill = new), position = "fill") +
+  scale_fill_manual(values = c("#BA0021", "#643E46")) +
+  theme_proj +
+  labs(y = element_blank(), x = "Year",
+       title = "Percent <span style = 'color: #BA0021;'>Explicit</span> and <span style = 'color: #643E46;'>Non-Explicit</span> music by year") +
+  theme(plot.title = element_markdown())
+``` 
 
 The reason for the unique spread of the data in the form of horizontal lines is due to the percent explicit scores. Each point on the plot is a country, and each country can have its own crime rate in a given year. However, every country in a given year would have the same percent explicit score since the music data is available on a whole and not on a country-by-country basis. For example, Burundi can have a crime rate different from Sudan in 2010, but they would both have the same percent explicit score.
 
-```{r regress-assault, fig.cap="Comparing rate of crime (for 100,000 population) and percent explicit music per year for 2010-2017, displayed by region for each type of crime: assault, robbery, and sexual violence"}
+```{r regress-assault, fig.height=3, fig.width=5, fig.cap="Comparing rate of crime (for 100,000 population) and percent explicit music per year for 2010-2017, displayed by region for each type of crime: assault, robbery, and sexual violence"}
 all_together %>%
   ggplot(aes(x = Rate, y = perc_expl, color = year)) +
     geom_jitter(size = 0.3, alpha = 0.6) +
@@ -629,10 +644,22 @@ all_together %>%
 
 There were a few outliers, so the Log Rate of Crimes were used instead of the Rate on its own. The logistic regression was used since Explicit is a binary variable, but also because we opted to use percent explicit music. The logistic regressions do not show a great amount of relationship between the changes in Rate of Crime and explicit music. The strongest indicator is in Sexual Violence, which makes sense since this type of crime had the greatest increase. 
 
-It may seem spurious to correlate music and crime. As always, corellation is not causation, but it is important to understand that music is a form of art, and societal tendencies can be expressed in the art of its time. As artists and people reflect on what is going on around them, they will produce or consume different types of music that may resonate with them and the current state of society at the time.
-
 # Conclusions & Discussions
 
-The main purpose of the conclusion will also be to re-evaluate the comparisons while drawing from the EDA to guide a discussion.
+Starting with the Spotify dataset and its various variables, it was possible to look at how music changed over time. Changes in music and happiness trends can be indicative of how the world is changing. The epochs associated with World War II had low valence (happiness) scores, and other epochs of relative peace and comfort had happier music. 
 
-As seen in the 
+Looking at the spotify dataset it was possible to see more than variations across time and look into how variables such as acousticness and energy were negatively related. Other positive relationships were with variables such as loudness and popularity.
+
+Looking at the different trends of music, we thought that it may be interesting to compare these trends to happiness and crime. Music has a strong impact on us as people, so it may reflect on trends in happiness or crime. 
+
+The happiness dataset came from the World Happiness Report which assigns a score for each country from 0 - 10 and also ranks the countries in order from most happy to least happy. Many factors are used, including, but not limited to, health, government, and major socio-economic conditions. Data from 2015-2020 was used and compared with valence from the Spotify dataset. 
+
+Over the different valence scores across the years, there did not seem to be a strong change in the median happiness score overall. There may be more to study in this, and it may be better to relate this data by region or some other subset of the global data. The reason for this is because countries that may have experienced major increases in happiness can be masked by the constantly low-scoring countries in these reports. It is notable that the past three years have seen both increases in valence and happiness scores.
+
+The association between crime and explicit music resulted in a similar message. Although, by exploring the crime data, it was possible to get a sense of how the different crimes changed over time. Sexual violence seems to be increasing over the years while the other types of crime, assault and robbery, are in stagnation or slight decrease. Of course, this changes by region of the world, however, on the whole, these are the trends.
+
+Explicit music, on the other hand, is definitely on the rise. We were interested in looking into whether this social expression of increased explicitness was connected to any rises in crime. The logistic regression model did not do much in proving this, and did not have a strong relationship. The only positive relationship was with sexual violence. One takeaway is that sexual violence rates are on the rise, as well as explicit music. These two items, even if they are not connected strongly to each other, are both becoming more and more pervasive in our daily lives.
+
+It may seem spurious to correlate music and crime. As always, corellation is not causation, but it is important to understand that music is a form of art, and societal tendencies can be expressed in the art of its time. As artists and people reflect on what is going on around them, they will produce or consume different types of music that may resonate with them and the current state of society at the time.
+
+We used these three datasets to explore any trends, comparisons, and visualizations that may have meaning and insight. Lots of our visualizations have insights on how each set changed over time, and how these changes reflect between the datasets. 
