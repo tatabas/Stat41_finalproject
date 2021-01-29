@@ -16,6 +16,7 @@ library(dplyr)
 library(maps)
 library(plotly)
 library(readr)
+library(patchwork)
 ```
 
 ```{r plot themes}
@@ -23,6 +24,23 @@ theme_proj = theme_minimal(base_family = "Palatino") +
   theme(plot.title.position = "plot")
 
 #plot.background = element_rect(fill = "#FEF5D1")
+```
+
+```{r loading data}
+#data is cleaned in ATABAS_HUANG_dataCleaning.Rmd and loaded here
+spotify <- read.csv("data/data.csv")
+spotify_by_year <- read.csv("data/data_by_year.csv")
+happiness_2015 <- read.csv("data/2015.csv")
+happiness_2016 <- read.csv("data/2016.csv")
+happiness_2017 <- read.csv("data/2017.csv")
+happiness_2018 <- read.csv("data/2018.csv")
+happiness_2019 <- read.csv("data/2019.csv")
+happiness_2020 <- read.csv("data/2020.csv")
+happiness <- read.csv("data/happiness.csv")
+robbery <- read.csv("data/robbery.csv")
+assault <- read.csv("data/assault.csv")
+sexualviolence <- read.csv("data/sexualviolence.csv")
+all_together <- read.csv("data/alltogether.csv")
 ```
 
 # Introduction
@@ -65,17 +83,6 @@ In addition to a study of trends in music consumption, this study aims to take a
 # Data
 
 The datasets used in this project required lots of work to clean and prepare for visualization and analysis. The data cleaning and code is outlines in the [ATABAS_HUANG_dataCleaning.Rmd file](https://github.com/tatabas/Stat41_finalproject), with short descriptions attached for each cleaning procedure.
-
-```{r loading data}
-#data is cleaned in ATABAS_HUANG_dataCleaning.Rmd and loaded here
-spotify <- read.csv("data/data.csv")
-spotify_by_year <- read.csv("data/data_by_year.csv")
-happiness <- read.csv("data/happiness.csv")
-robbery <- read.csv("data/robbery.csv")
-assault <- read.csv("data/assault.csv")
-sexualviolence <- read.csv("data/sexualviolence.csv")
-all_together <- read.csv("data/alltogether.csv")
-```
 
 **Music:**
 The music dataset is made available through the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). Spotify is an audio streaming service that was launched in 2008 and is now one of the most popular streaming platforms for music and podcasts. Therefore, the dataset is fairly comprehensive and contains lots of  information due to Spotify’s status as one of the most popular sites for music consumption. 
@@ -138,8 +145,8 @@ spotify_by_year %>%
   select(valence, acousticness, danceability, duration_ms, energy, instrumentalness, liveness, loudness, popularity, speechiness) %>%
   GGally::ggpairs() +
   theme_proj +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank()) +
+  #theme(panel.grid.major = element_blank(),
+  #      panel.grid.minor = element_blank()) +
   labs(caption = "Source: Spotify", title = "Pairs plot for music")
 ```
 
@@ -228,7 +235,7 @@ shinyApp(ui, server, options = list(height = 500))
 
 ## Happiness
 
-Before we begin combining the Spotify dataset with other datasets, it's important to look at those datasets individually. For example, how does the World Happiness dataset change over each year? The world map below, in Figure \@ref(fig:plotlyhappiness), is an interactive map that displays the change in world happiness in countries over the years from $2015$ to $2020$. (Hover over countries to see more specific information.)
+Before we begin combining the Spotify dataset with other datasets, it's important to look at those datasets individually. For example, how does the World Happiness dataset change over each year?
 
 ```{r plotlyhappiness, fig.cap="Map of World Happiness from 2015 - 2020"}
 #loading dataset of each country's ISO code (because plotly needs it to map countries)
@@ -293,7 +300,56 @@ ggplot(happiness, aes(y = Region, x = Happiness.Score, fill = Region)) +
        caption = "Source: World Happiness Report")
 ```
 
-The plot above shows a density plot of the happiness scores across different regions of the world. Note that some countries are included twice (ex: in Southeastern Asia AND in South Asia), as well as the fact that $2017$, $2018$, and $2019$ do not split countries into regions, so the happiness score is not plotted for those years. We can see that the happiest regions appear to be North America and Australia and New Zealand.
+```{r happy-ridges}
+happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(5, 1), ])
+happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(15, 1), ])
+happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(9, 1), ])
+happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(10, 1), ])
+happiness_2016 <- rbind(happiness_2016, happiness_2016[rep(6, 1), ])
+happiness_2016 <- rbind(happiness_2016, happiness_2016[rep(13, 1), ])
+happiness_2016 <- rbind(happiness_2016, happiness_2016[rep(8, 1), ])
+happiness_2016 <- rbind(happiness_2016, happiness_2016[rep(9, 1), ])
+  
+plot0 <- ggplot(happiness_2015, aes(y = Region, x = Happiness.Score, fill = Region)) + 
+  geom_density_ridges(alpha = .8) +
+  scale_fill_viridis_d(end = .75, option = "B") + 
+  scale_color_viridis_d(end = .75, option = "B") + 
+  theme_proj +
+  theme(legend.position = "none",
+        plot.subtitle = element_text(hjust = 1)) +
+  labs(title = "Happiness Score of Each Region",
+       subtitle = "2015",
+       y = "Region",
+       x = element_blank())
+
+plot1 <- ggplot(happiness_2016, aes(y = Region, x = Happiness.Score, fill = Region)) +
+  geom_density_ridges(alpha = .8) +
+  scale_fill_viridis_d(end = .75, option = "B") +
+  scale_color_viridis_d(end = .75, option = "B") +
+  theme_proj +
+  theme(legend.position = "none",
+        axis.text.y = element_blank(),
+        plot.subtitle = element_text(hjust = 1)) +
+  labs(subtitle = "2016",
+       y = element_blank(), 
+       x ="Happiness Score")
+
+plot2 <- ggplot(happiness_2020, aes(y = Regional.indicator, x = Ladder.score, fill = Regional.indicator)) +
+  geom_density_ridges(alpha = .8) +
+  scale_fill_viridis_d(end = .75, option = "B") +
+  scale_color_viridis_d(end = .75, option = "B") +
+  theme_proj +
+  theme(legend.position = "none",
+        plot.subtitle = element_text(hjust = 1))+
+  labs(subtitle = "2020",
+       caption = "SOURCE: World Happiness Report",
+       y = element_blank(), 
+       x = element_blank())
+
+plot0 + plot1 + plot2
+```
+
+The plot above shows a density plot of the happiness scores across different regions of the world. Note that some countries are included twice (ex: in Southeastern Asia AND in South Asia), as well as the fact that $2017$, $2018$, and $2019$ do not split countries into regions, so the happiness score is not plotted for those years. The most noticeable trends are that Western Europe, North America, and Australia and New Zealand tend to have the highest happiness scores.
 
 ```{r happiness-over-time, fig.cap="World Happiness from 2015 - 2020"}
 ggplot(data = happiness) +
@@ -439,8 +495,6 @@ Even more, however, it is possible to see that there have not been many changes 
 Robbery below... (still needs work)
 
 ```{r robbery, fig.width = 9, fig.height= 3, fig.cap = "Rates of Crime by Year and Region"}
-library(patchwork)
-
 p1 <- assault %>%
   group_by(Year, Region) %>%
   summarise(
@@ -520,16 +574,32 @@ ggplot(data = spotify_by_year_small) +
 spotify_and_happiness <- left_join(spotify_by_year_small, happiness, by = c("year" = "year"))
 ggplot(data = spotify_and_happiness) +
   geom_point(mapping = aes(x = valence, y = mean)) +
-  geom_smooth(mapping = aes(x = valence, y = mean), method = "lm", se = FALSE) +
+  #geom_smooth(mapping = aes(x = valence, y = mean), method = "lm", se = FALSE) +
+  theme_proj +
+  labs(title = "Relationship between Yearly Mean Valence and Mean World Happiness",
+       x = "yearly mean valence",
+       y = "mean happiness score",
+       caption = "SOURCE: World Happiness Report and Spotify")
+```
+
+In Figure \@ref(fig:happiness-valence-lm), the music and happiness datasets were combined. In doing so, this means that each country now has one valence value, and one (mean) happiness score. There does appear to be a trend here: as the valence score increases, the mean happiness score also increases. However, this is a slightly inaccurate representation of, at the very least, happiness score because each country has different happiness scores.
+
+```{r happy-cor}
+plot00 <- ggplot(data = spotify_and_happiness, aes(x = as.factor(round(valence,4)), y = Happiness.Score)) +
+  geom_jitter(mapping = aes(text = paste("Country: ",
+                                         Country,"\n Happiness Score: ",
+                                         Happiness.Score, "\n Year: ", year)), alpha = 0.5) +
+  geom_boxplot(alpha= 0.5, aes(fill = year)) +
+  scale_fill_viridis_c(option = "B") +
+  guides(fill = FALSE) +
+  labs(x = "Yearly Average Valence", y = "Happiness Score",
+       title = "Yearly Average Valence and World Happiness Scores") +
   theme_proj
+
+ggplotly(plot00, tooltip = "text")
 ```
 
-```{r}
-spotify_happiness_lm <- lm(mean ~ valence, data = spotify_and_happiness)
-summary(spotify_happiness_lm)
-```
-
-(We combined the Spotify and World Happiness datasets by year and fit a linear regression model. We didn't check the assumptions because there are only 6 points. This makes the two variables seem very highly correlated, when in reality, they may not be.)
+In Figure \@ref(fig:happy-cor), each individual country's happiness score was plotted against a valence value with boxplots overlayed on top. The plot is interactive to display the country name, happiness score, and year of each point. USince the music dataset does not have a country variable, each year/country is still only associated with one valence value. Therefore, valence was treated as a categorical variable in the above plot in order to overlay the boxplots on top of the points, so the distance between the valence values are not proportionate. Though changes in the plot are very minute, it's visible to see in the last four boxplots that the median happiness score, as well as the 75th quantile, increases as the valence increases.
 
 ## Crime and Explicitness
 
@@ -554,10 +624,9 @@ all_together %>%
 # Conclusions & Discussions
 
 ```{r}
-
 glimpse(sample_n(spotify, 5))
 ```
 
-(This will depend on what happens after we look at valence & world happiness and crime & explicitness.)
-
 The main purpose of the conclusion will also be to re-evaluate the comparisons while drawing from the EDA to guide a discussion.
+
+Music is a form of expression, and it tends to reflect societal feelings and
