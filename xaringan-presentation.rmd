@@ -282,7 +282,7 @@ ggplotly(plot00, tooltip = "text")
 ---
 # Crime and Explicit Music
 
-```{r regress-assault, out.width="70%", dpi = 150,include = FALSE}
+```{r regress-assault, out.width="70%", dpi = 150}
 all_together %>%
   ggplot(aes(x = Rate, y = perc_expl, color = year)) +
     geom_jitter(size = 0.3, alpha = 0.6) +
