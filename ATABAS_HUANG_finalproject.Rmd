@@ -64,6 +64,7 @@ Other trends in music, and art in general, can illuminate these trends. Seeing t
 Change in music is not limited to different life periods, but is also present in different phases in one’s life. For example, there is a popular practice for pregnant mothers to play classical music for their babies in hopes of making them more intelligent. In other phases of life, teens may be warned to stay away from certain genres of music because it will “rot their brains” or act as a bad influence. In either case, music enters our lives early. Many young musical prodigies are discovered because they begin reacting to music even before they are able to speak or walk.
 
 Our plan for this study relies on a comprehensive data set supplied by the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). This data encompasses many interesting variables, and there is much to experiment with. It provides a fertile ground for exploration into how music affects humans. Two variables specifically are eye-catching: valence, a measure of the happiness of a song, and explicitness, whether a song contains explicit lyrics or not. There are also variables regarding year published, popularity, acousticness, etc. There is a perceived trend that current music (2010-2020) is becoming more and more explicit and despairing. In fact, this can be seen in Figure \@ref(fig:scattervalyear) with a dip in valence after 1975. It may be possible to look at these different characteristics in acousticness, valence, and explicitness to create a model that predicts the popularity of music. 
+
 ```{r loading data}
 #data is cleaned in ATABAS_HUANG_dataCleaning.Rmd and loaded here
 spotify <- read.csv("data/data.csv")
@@ -158,7 +159,6 @@ spotify_by_year %>%
   #      panel.grid.minor = element_blank()) +
   labs(caption = "Source: Spotify", title = "Pairs plot for music")
 ```
-
 
 By looking at the pairs plot, it is possible to see that acousticness and energy are inversely related, and pretty strong at that (refer to plot with Figure \@ref(fig:gally), r = -0.967***). There are many other relationships to explore later when building a model. However, another promising relationships is between the loudness and popularity parameters. The songs that are louder also have a tendancy to be more popular. 
 
@@ -699,6 +699,20 @@ ggplot(data = spotify_by_year_small) +
 
 (This is the same EDA graph from earlier, but we limited the years to just $2015$ to $2020$ because these are the only years available in our World Happiness dataset.)
 
+```{r happiness-valence-lm}
+spotify_and_happiness <- left_join(spotify_by_year_small, happiness, by = c("year" = "year"))
+ggplot(data = spotify_and_happiness) +
+  geom_point(mapping = aes(x = valence, y = mean)) +
+  #geom_smooth(mapping = aes(x = valence, y = mean), method = "lm", se = FALSE) +
+  theme_proj +
+  labs(title = "Relationship between Yearly Mean Valence and Mean World Happiness",
+       x = "yearly mean valence",
+       y = "mean happiness score",
+       caption = "SOURCE: World Happiness Report and Spotify")
+```
+
+In Figure \@ref(fig:happiness-valence-lm), the music and happiness datasets were combined. In doing so, this means that each country now has one valence value, and one (mean) happiness score. There does appear to be a trend here: as the valence score increases, the mean happiness score also increases. However, this is a slightly inaccurate representation of, at the very least, happiness score because each country has different happiness scores.
+
 ```{r happy-box, fig.width=5, fig.height=3, fig.cap="Box plot of valence scores overlayed with points from the dataset"}
 spotify_by_year_small <- spotify_by_year %>% filter(year == 2015 | year == 2016 | year == 2017 | year == 2018 | year == 2019 | year == 2020)
 
@@ -718,36 +732,7 @@ plot00 <- ggplot(data = spotify_and_happiness, aes(x = as.factor(round(valence,4
 ggplotly(plot00, tooltip = "text")
 ```
 
-```{r happiness-valence-lm}
-spotify_and_happiness <- left_join(spotify_by_year_small, happiness, by = c("year" = "year"))
-ggplot(data = spotify_and_happiness) +
-  geom_point(mapping = aes(x = valence, y = mean)) +
-  #geom_smooth(mapping = aes(x = valence, y = mean), method = "lm", se = FALSE) +
-  theme_proj +
-  labs(title = "Relationship between Yearly Mean Valence and Mean World Happiness",
-       x = "yearly mean valence",
-       y = "mean happiness score",
-       caption = "SOURCE: World Happiness Report and Spotify")
-```
-
-In Figure \@ref(fig:happiness-valence-lm), the music and happiness datasets were combined. In doing so, this means that each country now has one valence value, and one (mean) happiness score. There does appear to be a trend here: as the valence score increases, the mean happiness score also increases. However, this is a slightly inaccurate representation of, at the very least, happiness score because each country has different happiness scores.
-
-```{r happy-cor}
-plot00 <- ggplot(data = spotify_and_happiness, aes(x = as.factor(round(valence,4)), y = Happiness.Score)) +
-  geom_jitter(mapping = aes(text = paste("Country: ",
-                                         Country,"\n Happiness Score: ",
-                                         Happiness.Score, "\n Year: ", year)), alpha = 0.5) +
-  geom_boxplot(alpha= 0.5, aes(fill = year)) +
-  scale_fill_viridis_c(option = "B") +
-  guides(fill = FALSE) +
-  labs(x = "Yearly Average Valence", y = "Happiness Score",
-       title = "Yearly Average Valence and World Happiness Scores") +
-  theme_proj
-
-ggplotly(plot00, tooltip = "text")
-```
-
-In Figure \@ref(fig:happy-cor), each individual country's happiness score was plotted against a valence value with boxplots overlayed on top. The plot is interactive to display the country name, happiness score, and year of each point. USince the music dataset does not have a country variable, each year/country is still only associated with one valence value. Therefore, valence was treated as a categorical variable in the above plot in order to overlay the boxplots on top of the points, so the distance between the valence values are not proportionate. Though changes in the plot are very minute, it's visible to see in the last four boxplots that the median happiness score, as well as the 75th quantile, increases as the valence increases.
+In Figure \@ref(fig:happy-box), each individual country's happiness score was plotted against a valence value with boxplots overlayed on top. The plot is interactive to display the country name, happiness score, and year of each point. USince the music dataset does not have a country variable, each year/country is still only associated with one valence value. Therefore, valence was treated as a categorical variable in the above plot in order to overlay the boxplots on top of the points, so the distance between the valence values are not proportionate. Though changes in the plot are very minute, it's visible to see in the last four boxplots that the median happiness score, as well as the 75th quantile, increases as the valence increases.
 
 ## Crime and Explicitness
 
