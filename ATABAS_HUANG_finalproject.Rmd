@@ -64,7 +64,16 @@ Other trends in music, and art in general, can illuminate these trends. Seeing t
 Change in music is not limited to different life periods, but is also present in different phases in one’s life. For example, there is a popular practice for pregnant mothers to play classical music for their babies in hopes of making them more intelligent. In other phases of life, teens may be warned to stay away from certain genres of music because it will “rot their brains” or act as a bad influence. In either case, music enters our lives early. Many young musical prodigies are discovered because they begin reacting to music even before they are able to speak or walk.
 
 Our plan for this study relies on a comprehensive data set supplied by the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). This data encompasses many interesting variables, and there is much to experiment with. It provides a fertile ground for exploration into how music affects humans. Two variables specifically are eye-catching: valence, a measure of the happiness of a song, and explicitness, whether a song contains explicit lyrics or not. There are also variables regarding year published, popularity, acousticness, etc. There is a perceived trend that current music (2010-2020) is becoming more and more explicit and despairing. In fact, this can be seen in Figure \@ref(fig:scattervalyear) with a dip in valence after 1975. It may be possible to look at these different characteristics in acousticness, valence, and explicitness to create a model that predicts the popularity of music. 
-
+```{r loading data}
+#data is cleaned in ATABAS_HUANG_dataCleaning.Rmd and loaded here
+spotify <- read.csv("data/data.csv")
+spotify_by_year <- read.csv("data/data_by_year.csv")
+happiness <- read.csv("data/happiness.csv")
+robbery <- read.csv("data/robbery.csv")
+assault <- read.csv("data/assault.csv")
+sexualviolence <- read.csv("data/sexualviolence.csv")
+all_together <- read.csv("data/alltogether.csv")
+```
 
 ```{r scattervalyear,fig.width=5,fig.height=3,fig.cap="Scatterplot of Spotify's valence score by year"}
 
@@ -136,7 +145,7 @@ In the above code, I have changed the variable names in each dataset so they sho
 
 ## Spotify
 
-There are some natural thoughts that may come up when thinking about what two characteristics in music may support each other, or on the other hand, go against each other. For example, one may think that acousticness and energy of a song are not necessarily compatible traits, however danceability and loudness may hold promise in a positive correlation. The pairs plot in Figure \@ref(fig:gally) explores these relationships and correlations.
+Naturally, there are types of music that go together. For example, it is unlikely that you would listen to a slow, acoustic song in a nightclub. Likewise, it is unlikely that "sad" songs are going to have lots of beat drops and high energy/electric music. All of these relationships can be explored with the Spotify data set and its many features. The pairs plot in Figure \@ref(fig:gally) explores these relationships and correlations.
 
 ```{r gally, fig.width=8,fig.height=8,fig.cap="Pairs plot for the variables in the Spotify dataset"}
 library(GGally)
@@ -151,7 +160,13 @@ spotify_by_year %>%
 ```
 
 
-By looking at the pairs plot, it is possible to see that acousticness and energy are inversely related, and pretty strong at that (refer to plot with \@ref(fig:gally), r = -0.967***). There are many other relationships to explore later when building a model. However, another promising relationships is between the loudness and popularity parameters. The songs that are louder also have a tendancy to be more popular.
+By looking at the pairs plot, it is possible to see that acousticness and energy are inversely related, and pretty strong at that (refer to plot with Figure \@ref(fig:gally), r = -0.967***). There are many other relationships to explore later when building a model. However, another promising relationships is between the loudness and popularity parameters. The songs that are louder also have a tendancy to be more popular. 
+
+Unfortunately, this process is very computationally taxing to run, so it was necessary to use the "spotify by year" dataset. This takes averages for the years, and does not have explicitness. Therefore, this pairs plot neglects the explicitness variable and each point is a year, not an individual song.
+
+The shiny app below takes a closer look at each of the relationships in the above pairs plot (Figure \@ref(fig:gally)). Each relationship can be plotted in a scatterplot both with and without a line. The scatterplot.
+
+Aside from the various scatterplots, it is interesting to see that a lot of the variables have bimodal distributions. Since the plots come from a long and versatile timeframe (an entire century), this may be an effect of changing taste over time. Changes in music usually reflects society's expressed mood (both in terms of production and consumption), so this is not a surprise. This is further supported by Figure \@ref(fig:scattervalyear), since the valence (or happiness) values fluctuate over time. This is especially clear in the transition from the "roaring 20s" to the 40s and 50s. The detrimental effects of World War II can even be seen in music! 
 
 ```{r shiny-ggally}
 library(shiny)
@@ -208,14 +223,15 @@ ui <- fluidPage(
 server <- function(input, output) {
     
     output$plot <- renderPlotly({
-   p3 <- 
-     spotify_by_year %>%
-     mutate(
-       constant = 0.02
-     ) %>%
-     ggplot(aes_string(x = input$x, y = input$y)) +
-     geom_point(aes(text = paste("Year:",year))) +
-     theme_proj +
+      
+     p3 <- 
+      spotify_by_year %>%
+      mutate(
+        constant = 0.02
+      ) %>%
+      ggplot(aes_string(x = input$x, y = input$y)) +
+      geom_point(aes(text = paste("Year:",year))) +
+      theme_proj +
           #need to add gridlines because tufte removes them
           theme(panel.grid.major = element_line(color = "gray90"),
                 panel.grid.minor = element_line(color = "gray90"),
@@ -224,8 +240,7 @@ server <- function(input, output) {
                caption = "Source: Spotify") +
        if(input$mod) {geom_smooth(method = "lm", se = FALSE)}
    
-   
-    ggplotly(p3, tooltip = "text")
+      ggplotly(p3, tooltip = "text")
     })
 }
 
@@ -371,9 +386,129 @@ Figure \@ref(fig:happiness-over-time) shows the mean happiness of the world over
 
 Continuing with the exploration, it is time to look at the crime data. The crime data comes from the United Nations Office on Drugs and Crime and depends on reportings from each country. This can create a discrepancy because each country has different considerations and guidelines on crime which will dictate if a specific incident enters their records or not.
 
-Withstanding these limitations, it is still beneficial to look at what is made available at hand. The shiny app allows the viewing of country assault rates, filtered by regions.
+By plotting each type of crime over the years and by the region in Figure \@ref(fig:robbery) it is possible to see that certain types of crime are more prevalent or less prevalent by region, and there are changes over the years. The changes over the years are present in some regions, but not in others. For example, Europe does not have much fluctuation in crime rates, whereas the Americas show a decline in Assault from 2010-2017. Additionally, Oceania is higher in Assault and Sexual Violence but lower in Robbery. 
 
-```{r shiny}
+```{r robbery, fig.width = 9, fig.height= 3, fig.cap = "Rates of Crime by Year and Region"}
+library(patchwork)
+
+p1 <- assault %>%
+  group_by(Year, Region) %>%
+  summarise(
+    means = mean(as.numeric(Rate), na.rm = TRUE)
+  ) %>%
+  ggplot() +
+    geom_col(aes(x = Year, y = means, fill = means)) +
+  theme_proj +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1) +
+  #scale_fill_viridis_c(option = "B", direction = -1) +
+  guides(fill = FALSE) +
+  labs(x = element_blank(), y = "Mean Rate per 100,000 population",
+       title = "Assault") +
+  theme(plot.title = element_text(size = 8)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = .1, hjust=.1)) +
+  facet_grid(. ~ Region)
+
+p2 <- robbery %>%
+  group_by(Year, Region) %>%
+  summarise(
+    means = mean(as.numeric(Rate), na.rm = TRUE)
+  ) %>%
+  ggplot() +
+    geom_col(aes(x = Year, y = means, fill = means)) +
+  theme_proj +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1) +
+  #scale_fill_viridis_c(option = "B", direction = -1) +
+  guides(fill = FALSE) +
+  labs(x = "Year", y = element_blank(),
+       title = "Robbery") +
+  theme(plot.title = element_text(size = 8)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = .1, hjust=.1)) +
+  facet_grid(. ~ Region)
+
+p3 <- sexualviolence %>%
+  group_by(Year, Region) %>%
+  summarise(
+    means = mean(as.numeric(Rate), na.rm = TRUE)
+  ) %>%
+  ggplot() +
+    geom_col(aes(x = Year, y = means, fill = means)) +
+  theme_proj +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1) +
+  #scale_fill_viridis_c(option = "B", direction = -1) +
+  guides(fill = FALSE) +
+  labs(x = element_blank(), y = element_blank(),
+       title = "Sexual Violence",
+       caption = "Source: UNODC Sexual Violence Crime Data") +
+  theme(plot.title = element_text(size = 8), 
+        axis.text.x = element_text(angle = 45, vjust = .1, hjust=.1)) +
+  facet_grid(. ~ Region)
+
+p1 + p2 + p3
+```
+
+Looking at this data split by region allows for us to see that not every region is the same, and that there are different trends. However, this idea also exists in specific countries of a given region. When viewed as a whole as in Figure \@ref(fig:not-region), the global trends on assault and robbery do not have much of a change, but there is an increasing trend in sexual violence. It may be true that sexual violence is increasing, but it may also be true that it is getting reported more. This may be in changes with the laws, or re-classifying types of assaults as sexual violence. In any way, there is an increase in sexual violence crimes according to the UNODC data.
+
+```{r not-region, fig.width = 9, fig.height = 3, fig.cap = "Rates of Crime by Type and Year}
+p1 <- assault %>%
+  group_by(Year, Region) %>%
+  summarise(
+    means = mean(as.numeric(Rate), na.rm = TRUE)
+  ) %>%
+  ggplot() +
+    geom_col(aes(x = Year, y = means), fill = "#981122") +
+  theme_proj +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1) +
+  #scale_fill_viridis_c(option = "B", direction = -1) +
+  guides(fill = FALSE) +
+  labs(x = element_blank(), y = "Mean Rate per 100,000 population",
+       title = "Assault") +
+  theme(plot.title = element_text(size = 10)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = .1, hjust=.1))
+
+p2 <- robbery %>%
+  group_by(Year, Region) %>%
+  summarise(
+    means = mean(as.numeric(Rate), na.rm = TRUE)
+  ) %>%
+  ggplot() +
+    geom_col(aes(x = Year, y = means), fill = "#981122") +
+  theme_proj +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1) +
+  #scale_fill_viridis_c(option = "B", direction = -1) +
+  guides(fill = FALSE) +
+  labs(x = "Year", y = element_blank(),
+       title = "Robbery") +
+  theme(plot.title = element_text(size = 10)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = .1, hjust=.1)) 
+
+p3 <- sexualviolence %>%
+  group_by(Year, Region) %>%
+  summarise(
+    means = mean(as.numeric(Rate), na.rm = TRUE)
+  ) %>%
+  ggplot() +
+    geom_col(aes(x = Year, y = means), fill = "#981122") +
+  theme_proj +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1) +
+  #scale_fill_viridis_c(option = "B", direction = -1) +
+  #guides(fill = FALSE) +
+  labs(x = element_blank(), y = element_blank(),
+       title = "Sexual Violence",
+       caption = "Source: UNODC Sexual Violence Crime Data") +
+  theme(plot.title = element_text(size = 10), 
+        axis.text.x = element_text(angle = 45, vjust = .1, hjust=.1)) 
+
+p1 + p2 + p3
+```
+
+It is known that reporting changes over time and by country, however, withstanding these limitations, it is still beneficial to look at what is made available at hand. The shiny app allows the viewing of country crime rates, filtering by crime type, region, and subregion. 
+
+Countries in similar geographic regions can be similar to a great degree. The U.S.A and Canada speak the same language and have much in common. The same can apply for Spanish-speaking countries in South America. However, each country can also be different in many ways, culturally, linguistically, and in terms of crime. 
+
+The shiny app below illustrates this notion, since there are countries of high violence rates that are grouped with countries that have lower violence rates (see, for example, in the shiny app with Assault, Americas, Northern America). Bermuda has a relatively much higher crime rate in comparison to Canada and the U.S.A. and this can drive the mean rate of crime for the Americas to go up.
+
+
+```{r shiny-crime}
 library(shiny)
 
 regions = assault$Region
@@ -427,16 +562,6 @@ server <- function(input, output) {
       else {sexualviolence} 
     })
     
-    #output$sub <- renderUI({
-        #req(input$reg)
-        #this_region <- type
-        
-        #sub_this_location <- sort(unique(this_region$Subregion))
-        
-        #selectInput(inputId = "sub", label = "Sub Region:", choices = sub_this_location, 
-                    #selected = "Middle Africa", multiple = FALSE)
-    #})
-    
     output$sub <- renderUI({
         req(input$reg)
         this_region <- if(input$crime == "assault"){assault %>% filter(Region == input$reg)}
@@ -488,6 +613,7 @@ shinyApp(ui, server, options = list(height = 500))
 
 The shiny app makes it possible to see trends in countries of certain regions and how they compare to each other. For example, it is clear that Hungary and Czech Republic have the highest rates of assault in the Eastern European regions. This type of observation can be made with a few other countries as well. Each region has a separate country that stands out.
 
+<<<<<<< HEAD
 Also, the lines through the points show that not all countries have data for every year. This can be a limitation, however, the methods used later will make use of the general trends and not data per country.
 
 Even more, however, it is possible to see that there have not been many changes in rates over time. For example, the average rates as shown in Figure \@ref(fig:robbery) shows that the rates have not changed greatly over the years.
@@ -548,6 +674,9 @@ p3 <- sexualviolence %>%
 
 p1 + p2 + p3
 ```
+=======
+Also, the lines through the points show that not all countries have data for every year. This can be a limitation, however, the methods used later will make use of the general trends and not data per country. The UNODC does not received a response from every country in a given year, so it is not feasible to assume that there are not missing informations.
+>>>>>>> be0c9d0acd253d48dc3236dca3dac2a2e218abea
 
 # Comparing Datasets/Variables
 
@@ -569,6 +698,25 @@ ggplot(data = spotify_by_year_small) +
 ```
 
 (This is the same EDA graph from earlier, but we limited the years to just $2015$ to $2020$ because these are the only years available in our World Happiness dataset.)
+
+```{r happy-box, fig.width=5, fig.height=3, fig.cap="Box plot of valence scores overlayed with points from the dataset"}
+spotify_by_year_small <- spotify_by_year %>% filter(year == 2015 | year == 2016 | year == 2017 | year == 2018 | year == 2019 | year == 2020)
+
+spotify_and_happiness <- left_join(spotify_by_year_small, happiness, by = c("year" = "year"))
+
+#spotify_and_happiness 
+
+plot00 <- ggplot(data = spotify_and_happiness, aes(x = as.factor(round(valence,4)), y = Happiness.Score)) +
+  geom_jitter(mapping = aes(text = paste("Country: ", Country,"\n Happiness Score: ", Happiness.Score, "\n Year: ", year)), alpha = 0.5) +
+  geom_boxplot(alpha= 0.5, aes(fill = year)) +
+  scale_fill_viridis_c(option = "B") +
+  guides(fill = FALSE) +
+  labs(x = "Yearly Average Valence", y = "Happiness Score",
+       title = "Yearly Average Valence and World Happiness Scores") +
+  theme_proj
+
+ggplotly(plot00, tooltip = "text")
+```
 
 ```{r happiness-valence-lm}
 spotify_and_happiness <- left_join(spotify_by_year_small, happiness, by = c("year" = "year"))
@@ -603,6 +751,10 @@ In Figure \@ref(fig:happy-cor), each individual country's happiness score was pl
 
 ## Crime and Explicitness
 
+In Figure \@ref(fig:robbery), there was evidence that crime changed over time, even if there was only a slight change. Now, comes the question whether this change was also paired with the changes in explicit music over time. In order to start the comparison, the percent explicit music per year was calculated. This serves as a general indicator for how prevalent explicit music was in a year. Percent explicit music increases continually in the selected time frame from 2010 - 2017, as indicated by the darkening shade of the colors in Figure \@ref(fig:regress-assault).
+
+The reason for the unique spread of the data in the form of horizontal lines is due to the percent explicit scores. Each point on the plot is a country, and each country can have its own crime rate in a given year. However, every country in a given year would have the same percent explicit score since the music data is available on a whole and not on a country-by-country basis. For example, Burundi can have a crime rate different from Sudan in 2010, but they would both have the same percent explicit score.
+
 ```{r regress-assault, fig.cap="Comparing rate of crime (for 100,000 population) and percent explicit music per year for 2010-2017, displayed by region for each type of crime: assault, robbery, and sexual violence"}
 all_together %>%
   ggplot(aes(x = Rate, y = perc_expl, color = year)) +
@@ -611,8 +763,8 @@ all_together %>%
     method = "glm", method.args = list(family = "binomial"), 
     color = "#2E2927", se = FALSE, size = 1
     ) +
-    scale_color_viridis_c(option = "B", direction = -1) +
-    #scale_color_distiller(palette = "YlOrRd", direction = 1) +
+    #scale_color_viridis_c(option = "B", direction = -1) +
+    scale_color_distiller(palette = "YlOrRd", direction = 1) +
     facet_grid(type ~ ., scale = "free_x") +
     labs(x = "Log Rate of Crime", y = "% Explicit Music", 
          color = "Year", caption = "Source: UNODC Crime Data and Spotify API",
@@ -621,8 +773,9 @@ all_together %>%
     theme_proj
 ```
 
-# Conclusions & Discussions
+There were a few outliers, so the Log Rate of Crimes were used instead of the Rate on its own. The logistic regression was used since Explicit is a binary variable, but also because we opted to use percent explicit music. The logistic regressions do not show a great amount of relationship between the changes in Rate of Crime and explicit music. The strongest indicator is in Sexual Violence, which makes sense since this type of crime had the greatest increase. 
 
+<<<<<<< HEAD
 ```{r}
 glimpse(sample_n(spotify, 5))
 ```
@@ -630,3 +783,12 @@ glimpse(sample_n(spotify, 5))
 The main purpose of the conclusion will also be to re-evaluate the comparisons while drawing from the EDA to guide a discussion.
 
 Music is a form of expression, and it tends to reflect societal feelings and
+=======
+It may seem spurious to correlate music and crime. As always, corellation is not causation, but it is important to understand that music is a form of art, and societal tendencies can be expressed in the art of its time. As artists and people reflect on what is going on around them, they will produce or consume different types of music that may resonate with them and the current state of society at the time.
+
+# Conclusions & Discussions
+
+The main purpose of the conclusion will also be to re-evaluate the comparisons while drawing from the EDA to guide a discussion.
+
+As seen in the 
+>>>>>>> be0c9d0acd253d48dc3236dca3dac2a2e218abea
