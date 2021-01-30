@@ -22,8 +22,6 @@ library(patchwork)
 ```{r plot themes}
 theme_proj = theme_minimal(base_family = "Palatino") + 
   theme(plot.title.position = "plot")
-
-#plot.background = element_rect(fill = "#FEF5D1")
 ```
 
 ```{r loading data}
@@ -49,7 +47,7 @@ all_together <- read.csv("data/alltogether.csv")
 
 Music has an incredibly fascinating effect on people. Humans are one of the few, if not the only, animals that can naturally feel rhythms. When music is played, it only takes moments for people to clap along to the beat of the song. Specific genres and styles of music have defined generations and cultures time and time again. It’s only natural for music to be so powerful for people.
 
-This notion has picked up much attention in the media. In fact, ABC Science released a video a few years ago ( [watch it here](https://www.youtube.com/watch?v=rnUSNbqtVJI) ). discussing the power of music on the brain, specifically for people with dementia and Parkinson’s. In the video, researchers showed how playing music reminiscent of one’s past can trigger memories, even for someone who has forgotten them. They did so by curating specially tailored playlists from the pasts of certain residents at a nursing home. When the dementia patients listened to these playlists, many of them had a sudden shift in mood. Their family members were so surprised to see them “come back to life,” in a sense. These residents would talk about their past and be more open and happy than they had been in months.
+This notion has picked up much attention in the media. In fact, ABC Science released a video a few years ago ( [watch it here](https://www.youtube.com/watch?v=rnUSNbqtVJI) ). discussing the power of music on the brain, specifically for people with dementia and Parkinson’s. In the video, researchers showed how playing music reminiscent of one’s past can trigger memories, even for someone who has forgotten them. They did so by curating specially tailored playlists from the pasts of certain residents at a nursing home. When the dementia patients listened to these playlists, many of them had a sudden shift in mood. Their family members were so surprised to see them “come back to life,” in a sense. These residents would talk about their past and be more open and happy than they had been in months, very different from behavior typically displayed by people with dementia.
 
 Another segment of the video showed how music can help with diseases that affect the motor system, like Parkinson’s. At a human movement lab, a professor has spent years analyzing and trying to solve these movement disorders. One thing she tried was playing music, and it’s incredible to see the change that overcomes her patients. John, one of her patients, suffers from Parkinson’s. The video shows how the debilitating disease limits his natural motor skills and prevents him from having voluntary movements. However, after applying a nice tune with the professor’s music, John is able to not only walk, but dance with a partner.
 
@@ -57,13 +55,16 @@ The last part of the video follows a man named Shane who suffered severe brain d
 
 This video illustrates not only the power in music, but its prevalence in our natural being. It is much more than a form of entertainment, it is part of a complete life. The rhythm and tunes of songs -- whether from traditional instruments, natural sounds, or digital playlists -- bury themselves in our brains and become an integral part of human life. 
 
-Additionally, music is not immune to the various societal trends that can morph and change over time. Since it is a form of art, it generally reflects on what major feelings and emotions are being spread in a given time. The prevalence of music in our lives combined with the artistic essence makes it a strong vantage point when looking at how society changes the way it expresses itself. For example, there are times in the late 1940’s and 1950’s where songs tend to be filled with sad or melancholic lyrics, making for more of a “low-mood” song. This has much to do with the major wars at the time, namely World War II and the subsequent Cold War. 
+Additionally, music is not immune to the various societal trends that can morph and change over time. Since it is a form of art and expression, it generally reflects on what major feelings and emotions are being spread in a given time. The prevalence of music in our lives combined with the artistic essence makes it a strong vantage point when looking at how society changes the way it expresses itself. For example, there are times in the late 1940’s and 1950’s where songs tend to be filled with sad or melancholic lyrics, making for more of a “low-mood” song. This has much to do with the major wars at the time, namely World War II and the subsequent Cold War. 
 
-Other trends in music, and art in general, can illuminate these trends. Seeing the trends in how artists express their views of the world provides a look into life at during a given time period. Furthermore, the advantageous point with music is also that the popularity of a song or genre can be tracked. Music therefore not only gives a perspective on what songs and emotions are being produced in a given time, but to what extent each is consumed. So, it is possible to look at both the expressed emotions in music, and how much it resonates with listeners.
+Other trends in music, and art in general, can illuminate these trends. Seeing the trends in how artists express their views of the world provides a look into life during that given time period. Another advantage of music is that the popularity of a song or genre can be tracked. This is important because music not only gives insight on what songs are being produced in a given time, but also to what extent they are consumed. So, it is possible to look at both the expressed emotions in music and how much it resonates with listeners of that time.
 
 Change in music is not limited to different life periods, but is also present in different phases in one’s life. For example, there is a popular practice for pregnant mothers to play classical music for their babies in hopes of making them more intelligent. In other phases of life, teens may be warned to stay away from certain genres of music because it will “rot their brains” or act as a bad influence. In either case, music enters our lives early. Many young musical prodigies are discovered because they begin reacting to music even before they are able to speak or walk.
 
-Our plan for this study relies on a comprehensive data set supplied by the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). This data encompasses many interesting variables, and there is much to experiment with. It provides a fertile ground for exploration into how music affects humans. Two variables specifically are eye-catching: valence, a measure of the happiness of a song, and explicitness, whether a song contains explicit lyrics or not. There are also variables regarding year published, popularity, acousticness, etc. There is a perceived trend that current music (2010-2020) is becoming more and more explicit and despairing. In fact, this can be seen in Figure \@ref(fig:scattervalyear) with a dip in valence after 1975. It may be possible to look at these different characteristics in acousticness, valence, and explicitness to create a model that predicts the popularity of music. 
+Our plan for this study relies on a comprehensive data set supplied by the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). This data encompasses many interesting variables, and there is much to experiment with. It provides a fertile ground for exploration into how music affects humans. Two variables specifically are eye-catching: valence, a measure of the happiness of a track, and explicitness, a binary variable indicating whether a track contains explicit content (1) or not (0). There are also variables regarding year published, popularity, acousticness, etc. There is a perceived trend that current music (2010-2020) is becoming more and more explicit and despairing. In fact, this can be seen in Figure \@ref(fig:scattervalyear) with a dip in valence after 1975.
+
+(Not sure we need this because we're not doing this anymore?)
+It may be possible to look at these different characteristics in acousticness, valence, and explicitness to create a model that predicts the popularity of music. 
 
 ```{r scattervalyear,fig.width=5,fig.height=3,fig.cap="Scatterplot of Spotify's valence score by year"}
 
@@ -76,31 +77,34 @@ ggplot(data = spotify_by_year) +
   theme_proj 
 ```
 
-
-In addition to a study of trends in music consumption, this study aims to take a closer look at correlations between the music dataset and other datasets in mental health and crime. Is it possible that the prevalence in explicit music is rising with crime rates? Is it possible that the decrease in valence score is correlated with an increase in mental health cases? These questions will be discussed in the subsequent sections.
+This study aims to take a closer look at correlations between the music data set and other data sets in mental health and crime. Is it possible that the prevalence of explicit music is rising with crime rates? Is it possible that the decrease in valence score is correlated with an increase in mental health cases? These questions will be discussed in the subsequent sections.
 
 # Data
 
-The datasets used in this project required lots of work to clean and prepare for visualization and analysis. The data cleaning and code is outlines in the [ATABAS_HUANG_dataCleaning.Rmd file](https://github.com/tatabas/Stat41_finalproject), with short descriptions attached for each cleaning procedure.
+The data sets used in this project required lots of work to clean and prepare for visualization and analysis. The data cleaning and code is outlines in the [ATABAS_HUANG_dataCleaning.Rmd file](https://github.com/tatabas/Stat41_finalproject), with short descriptions attached for each cleaning procedure.
 
 **Music:**
-The music dataset is made available through the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). Spotify is an audio streaming service that was launched in 2008 and is now one of the most popular streaming platforms for music and podcasts. Therefore, the dataset is fairly comprehensive and contains lots of  information due to Spotify’s status as one of the most popular sites for music consumption. 
+The music data set is made available through the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). Spotify is an audio streaming service that was launched in 2008 and is now one of the most popular streaming platforms for music and podcasts. Therefore, the data set is fairly comprehensive and contains lots of  information due to Spotify’s status as one of the most popular sites for music consumption. 
 
-The data encompasses many interesting variables. Of course there are descriptors such as artist or band name, year of song, genre, and key, but there are many other metrics that require more attention.
+The data encompasses many interesting variables. There are descriptors such as artist or band name, year of song, genre, and key, but there are many other metrics that require more attention.
 
-These specially catered metrics usually range from 0 to 1. For example Spotify describes the metric for the valence (happiness) of a song as follows: “A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry)”.
+These specially catered metrics usually range from 0 to 1. For example, Spotify describes the metric for the valence (happiness) of a song as follows: “A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry)”.
 
-Other metrics such as explicitness are described as follows: “Whether or not the episode has explicit content (true = yes it does; false = no it does not OR unknown)”. Whereas danceability is described as: “Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable”. 
+Other metrics such as explicitness are described as follows: “Whether or not the episode has explicit content (true = yes it does; false = no it does not OR unknown)”.
+
+
+(I don't think we need this?)
+Whereas danceability is described as: “Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable”. 
 
 **Crime:**
 
-The United Nations Office on Drugs and Crime (UNODC) has many comprehensive datasets that pertain to crime of all different shapes and forms. The organization, as a subset of the United Nations, works to cover pressing concerns related to crime in general, but they focus on tackling and/or preventing crime. The datasets present on their website are grouped by type of crime with subsets for more details. For example, there are differentiations made between sexual violence, homicide, and assault. Further, assault can be analyzed more specifically through the different mechanisms (firearm, sharp object, serious, etc.)
+The United Nations Office on Drugs and Crime (UNODC) has many comprehensive data sets that pertain to crime of all different shapes and forms. The organization, as a subset of the United Nations, works to cover pressing concerns related to crime in general, but they focus on tackling and/or preventing crime. The data sets present on their website are grouped by type of crime with further subsets for more details. For example, there are distinctions made between sexual violence, homicide, and assault. Further, assault can be analyzed more specifically through the different mechanisms (firearm, sharp object, serious, etc.)
 
-With a dataset of this comprehensive nature, it is possible to make different comparisons by extracting the parts of the data that are of interest. In this case, it was of interest to study the relationship between trends in crime and trends in explicit music. There are many studies that have shown types of music to have a postivie impact (classical music, joyous music). However, there are also claims that media in the form of video games, TV, or music can have an equally negative impact depending on their contents. Along these lines, it may be interesting to explore any relationships between explicit music and crime.
+With a data set of this comprehensive nature, it is possible to make different comparisons by extracting the parts of the data that are of interest. In this case, it was of interest to study the relationship between trends in crime and trends in explicit content in music. There are many studies that have shown types of music to have a positive impact (classical music, joyous music). However, there are also claims that media in the form of video games, TV, and/or music can have an equally negative impact depending on their contents. Along these lines, it may be interesting to explore any relationships between explicit music and crime.
 
-The limitations to this dataset originate more from the collection process. The data are collected from the annual United Nations crime trends survey. This is conducted by the UNODC and takes responses from the government officials in a given country. This method not only relies on countries reporting to the U.N., but also relies on local authorities within countries like the U.S. and their reports to the federal level. There may be differences in reporting crime when compared to different countries, because each country can have different laws regarding different crimes. Even states or counties within a given country can have different guidelines for recording a crime. This should be kept in consideration when drawing conclusions.
+The limitations to this data set originate more from the collection process. The data is collected from the annual United Nations crime trends survey. This is conducted by the UNODC and takes responses from the government officials in a given country. This method not only relies on countries reporting to the U.N., but also relies on local authorities within countries and then reporting to the federal level. There may be differences in reporting crime across different countries, because each country may have different laws regarding different crimes. Even states or counties within a given country can have different guidelines for recording a crime. This should be kept in consideration when drawing conclusions.
 
-Since all of these datasets were provided in separate files, it was necessary to read the excel files separately and then follow with a merge by year.
+Since all of these data sets were provided in separate files, it was necessary to read the excel files separately and then follow with a merge by year.
 
 The data also comes in a format that is not easy to work with, having a column of rate and count for each year (i.e. rate of crime, count of crime). The years available are from 2010 to 2017.
 
@@ -112,11 +116,9 @@ The data from UNODC will be used to study
 
 **World Happiness:**
 
-The first World Happiness Report was released on April 1, 2012 as a foundational text for the UN High Level Meeting: Well-being and Happiness: Defining a New Economic Paradigm, drawing international attention. The report outlined the state of world happiness, causes of happiness and misery, and policy implications highlighted by case studies. In 2013, the second World Happiness Report was issued, and since then has been issued on an annual basis with the exception of 2014. The report primarily uses data from the Gallup World Poll.
+The first World Happiness Report was released on April 1, 2012 as a foundational text for the U.N. High Level Meeting: Well-being and Happiness: Defining a New Economic Paradigm, drawing international attention. The report outlined the state of world happiness, causes of happiness and misery, and policy implications highlighted by case studies. In 2013, the second World Happiness Report was issued, and since then has been issued on an annual basis with the exception of 2014. The report primarily uses data from the Gallup World Poll.
 
 The rankings of national happiness are based on a Cantril ladder survey. Nationally representative samples of respondents are asked to think of a ladder, with the best possible life for them being a 10, and the worst possible life being a 0. They are then asked to rate their own current lives on that 0 to 10 scale. The report correlates the results with various life factors.
-
-In the reports, experts in fields including economics, psychology, survey analysis, and national statistics, describe how measurements of well-being can be used effectively to assess the progress of nations, and other topics. Each report is organized by chapters that delve deeper into issues relating to happiness, including mental illness, the objective benefits of happiness, the importance of ethics, policy implications, and links with the Organization for Economic Co-operation and Development's (OECD) approach to measuring subjective well-being and other international and national efforts.
 
 Data is collected from people in over 150 countries. Each variable measured reveals a populated-weighted average score on a scale running from 0 to 10 that is tracked over time and compared against other countries. These variables currently include:
 
@@ -129,7 +131,7 @@ Data is collected from people in over 150 countries. Each variable measured reve
 
 Each country is also compared against a hypothetical nation called Dystopia. Dystopia represents the lowest national averages for each key variable and is, along with residual error, used as a regression benchmark. The six metrics are used to explain the estimated extent to which each of these factors contribute to increasing life satisfaction when compared to the hypothetical nation of Dystopia, but they themselves do not have an impact on the total score reported for each country
 
-In the above code, I have changed the variable names in each dataset so they should all (mostly) match with each other. Then, I combined all the datasets into one big "happiness" dataset.
+There are several limitations to the data set. The data set found only contains data from the years 2015 to 2020, despite the World Happiness Report starting in 2012. Additionally, although other variables such as real GDP per capita, social support, healthy life expectancy, etc. are measured, they are not used to scale or normalize the happiness score. For the purpose of this study, the data sets were all combined into one large happiness data set. The "United Arab Emirates" was removed from the 2018 World Happiness data set because its perception of corruption variable was a character ("N/A"), preventing it from being binded to the other data sets. These issues should also be kept in mind when drawing conclusions.
 
 # Exploration
 
@@ -149,13 +151,14 @@ spotify_by_year %>%
   labs(caption = "Source: Spotify", title = "Pairs plot for music")
 ```
 
+(Not sure if we need this anymore because we're no longer building the model)
 By looking at the pairs plot, it is possible to see that acousticness and energy are inversely related, and pretty strong at that (refer to plot with Figure \@ref(fig:gally), r = -0.967***). There are many other relationships to explore later when building a model. However, another promising relationships is between the loudness and popularity parameters. The songs that are louder also have a tendancy to be more popular. 
 
-Unfortunately, this process is very computationally taxing to run, so it was necessary to use the "spotify by year" dataset. This takes averages for the years, and does not have explicitness. Therefore, this pairs plot neglects the explicitness variable and each point is a year, not an individual song.
+Unfortunately, this process is very computationally taxing to run, so it was necessary to use the "spotify_by_year" dataset. This takes averages for the years, and does not have explicitness. Therefore, this pairs plot neglects the explicitness variable and each point is a year, rather than an individual song.
 
 The shiny app below takes a closer look at each of the relationships in the above pairs plot (Figure \@ref(fig:gally)). Each relationship can be plotted in a scatterplot both with and without a line. The scatterplot.
 
-Aside from the various scatterplots, it is interesting to see that a lot of the variables have bimodal distributions. Since the plots come from a long and versatile timeframe (an entire century), this may be an effect of changing taste over time. Changes in music usually reflects society's expressed mood (both in terms of production and consumption), so this is not a surprise. This is further supported by Figure \@ref(fig:scattervalyear), since the valence (or happiness) values fluctuate over time. This is especially clear in the transition from the "roaring 20s" to the 40s and 50s. The detrimental effects of World War II can even be seen in music! 
+Aside from the various scatter plots, it is interesting to see that a lot of the variables have bimodal distributions. Since the plots come from a long and versatile time frame (an entire century), this may be an effect of changing taste over time. Changes in music usually reflect society's expressed mood (both in terms of production and consumption), so this is not a surprise. This is further supported by Figure \@ref(fig:scattervalyear), since the valence (or happiness of a song) values fluctuate over time. This is especially clear in the transition from the "roaring 20s" to the 40s and 50s. The detrimental effects of World War II can even be seen in music! 
 
 ```{r shiny-ggally}
 library(shiny)
@@ -239,7 +242,7 @@ shinyApp(ui, server, options = list(height = 500))
 
 ## Happiness
 
-Before we begin combining the Spotify dataset with other datasets, it's important to look at those datasets individually. For example, how does the World Happiness dataset change over each year?
+Before we begin combining the Spotify data set with other data sets, it's important to look at those data sets individually. For example, how does the happiness data set change over each year? How does happiness score vary across countries? These questions can be explored in Figure \@ref(fig:plotlyhappiness). Figure \@ref(fig:plotlyhappiness) is n interactive map that displays the change in world happiness in countries over the years from 2015 to 2020. Hovering over the countries reveals country name, happiness rank, and happiness score.
 
 ```{r plotlyhappiness, fig.width = 7, fig.height= 5, fig.cap="Map of World Happiness from 2015 - 2020"}
 #loading dataset of each country's ISO code (because plotly needs it to map countries)
@@ -286,22 +289,6 @@ p1 <- plot_geo(happiness_plotly, locationmode = "world", frame = ~year) %>%
 
 p1
 # credit to this tutorial: https://www.youtube.com/watch?v=RrtqBYLf404
-```
-
-The world map above, in Figure \@ref(fig:plotlyhappiness), is an interactive map that displays the change in world happiness in countries over the years from $2015$ to $2020$. (Hover over countries to see more specific information.)
-
-```{r happiness-ridges, fig.width = 7, fig.height= 5, fig.cap = "Density Ridges Plot of Happiness by Region"}
-library(ggridges)
-ggplot(happiness, aes(y = Region, x = Happiness.Score, fill = Region)) + 
-  geom_density_ridges(alpha = .8) +
-  scale_fill_viridis_d(end = .75, option = "B") + 
-  scale_color_viridis_d(end = .75, option = "B") + 
-  theme_proj +
-  theme(legend.position = "none") +
-  labs(title = "Happiness Score of Each Region",
-       x = "Happiness Score",
-       y = "Region",
-       caption = "Source: World Happiness Report")
 ```
 
 ```{r happy-ridges, fig.width = 7, fig.height= 5,}
@@ -353,7 +340,7 @@ plot2 <- ggplot(happiness_2020, aes(y = Regional.indicator, x = Ladder.score, fi
 plot0 + plot1 + plot2
 ```
 
-The plot above shows a density plot of the happiness scores across different regions of the world. Note that some countries are included twice (ex: in Southeastern Asia AND in South Asia), as well as the fact that $2017$, $2018$, and $2019$ do not split countries into regions, so the happiness score is not plotted for those years. The most noticeable trends are that Western Europe, North America, and Australia and New Zealand tend to have the highest happiness scores.
+Figure \@ref(fig:happy-ridges) above shows a density plot of the happiness scores across different regions of the world. Note that regions are split differently in 2015 and 2016 than 2020, so the plots may not be directly comparable, as different countries may be included in different regions. Additionally, 2017, 2018, and 2019 do not split countries into regions, so the ridges plot is not available for those years. The most noticeable trends are that Western Europe, North America, and Australia and New Zealand tend to have the highest happiness scores across all three years. Other noticeable features include the regions that have multiple modes, such as Sub-Saharan Africa and South Asia. This pattern shows that some regions may have countries that vastly differ in happiness scores, where countries tend to "cluster" around certain happiness scores.
 
 ```{r happiness-over-time, fig.width = 7, fig.height= 5, fig.cap="World Happiness from 2015 - 2020"}
 ggplot(data = happiness) +
@@ -369,17 +356,15 @@ ggplot(data = happiness) +
         panel.grid.minor = element_line(color = "gray90"))
 ```
 
-Figure \@ref(fig:happiness-over-time) shows the mean happiness of the world over time. The range is typically from $0$ to $10$, where $10$ would be the happiest, so it's important to note that while there is an increase in happiness after $2017$, the average only goes up by about $0.125$ points.
+Figure \@ref(fig:happiness-over-time) shows the mean happiness of the world over time. We can see that after 2017, the happiness score steadily increases. The range of happiness score is typically from 0 to 10, where 10 would be the happiest, so it's important to note that while there is an increase in happiness after 2017, the average only goes up by about 0.125 points.
 
 ## Crime
 
 Continuing with the exploration, it is time to look at the crime data. The crime data comes from the United Nations Office on Drugs and Crime and depends on reportings from each country. This can create a discrepancy because each country has different considerations and guidelines on crime which will dictate if a specific incident enters their records or not.
 
-By plotting each type of crime over the years and by the region in Figure \@ref(fig:robbery) it is possible to see that certain types of crime are more prevalent or less prevalent by region, and there are changes over the years. The changes over the years are present in some regions, but not in others. For example, Europe does not have much fluctuation in crime rates, whereas the Americas show a decline in Assault from 2010-2017. Additionally, Oceania is higher in Assault and Sexual Violence but lower in Robbery. 
+By plotting each type of crime over the years and by the region in Figure \@ref(fig:robbery) it is possible to see that certain types of crime are more prevalent or less prevalent by region, and there are some notable changes over the years. The changes over the years are present in some regions, but not in others. For example, Europe does not have much fluctuation in crime rates, whereas the Americas show a decline in Assault from 2010-2017. Additionally, Oceania has higher rates of Assault and Sexual Violence but lower rates of Robbery. 
 
 ```{r robbery, fig.width = 9, fig.height= 5, fig.cap = "Rates of Crime by Year and Region"}
-library(patchwork)
-
 p1 <- assault %>%
   group_by(Year, Region) %>%
   summarise(
@@ -436,7 +421,7 @@ p3 <- sexualviolence %>%
 p1 + p2 + p3
 ```
 
-Looking at this data split by region allows for us to see that not every region is the same, and that there are different trends. However, this idea also exists in specific countries of a given region. When viewed as a whole as in Figure \@ref(fig:not-region), the global trends on assault and robbery do not have much of a change, but there is an increasing trend in sexual violence. It may be true that sexual violence is increasing, but it may also be true that it is getting reported more. This may be in changes with the laws, or re-classifying types of assaults as sexual violence. In any way, there is an increase in sexual violence crimes according to the UNODC data.
+Looking at this data split by region allows for us to see that crime rate varies greatly across regions, and there are different trends. However, this idea also exists in specific countries of a given region. When viewed as a whole as in Figure \@ref(fig:not-region), the global trends on assault and robbery do not have much of a change, but there is an increasing trend in sexual violence. It may be true that sexual violence is increasing, but it may also be true that it is getting reported more than the other crimes. This may be due to changes with laws or re-classifying certain types of assaults as sexual violence. In any way, there is an increase in sexual violence crimes according to the UNODC data.
 
 ```{r not-region, fig.width = 9, fig.height = 5, fig.cap ="Rates of Crime by Type and Year"}
 p1 <- assault %>%
@@ -492,12 +477,11 @@ p3 <- sexualviolence %>%
 p1 + p2 + p3
 ```
 
-It is known that reporting changes over time and by country, however, withstanding these limitations, it is still beneficial to look at what is made available at hand. The shiny app allows the viewing of country crime rates, filtering by crime type, region, and subregion. 
+It is known that ways of reporting changes over time and by country. However, withstanding these limitations, it is still beneficial to look at what is made available at hand. The Shiny app allows the viewing of country crime rates, filtering by crime type, region, and subregion. 
 
-Countries in similar geographic regions can be similar to a great degree. The U.S.A and Canada speak the same language and have much in common. The same can apply for Spanish-speaking countries in South America. However, each country can also be different in many ways, culturally, linguistically, and in terms of crime. 
+Countries in similar geographic regions can be similar to a great degree. The U.S.A and Canada generally speak the same language and have much in common. The same can apply for Spanish-speaking countries in South America. However, each country can also be different in many ways, culturally, linguistically, and in terms of crime. 
 
-The shiny app below illustrates this notion, since there are countries of high violence rates that are grouped with countries that have lower violence rates (see, for example, in the shiny app with Assault, Americas, Northern America). Bermuda has a relatively much higher crime rate in comparison to Canada and the U.S.A. and this can drive the mean rate of crime for the Americas to go up.
-
+The Shiny app below illustrates this notion, since there are countries of high violence rates that are grouped with countries that have lower violence rates (see, for example, in the Shiny app with Assault, Americas, Northern America). Bermuda has a relatively much higher crime rate in comparison to Canada and the U.S.A., and this can drive the mean rate of crime for the Americas to go up.
 
 ```{r shiny-crime}
 library(shiny)
@@ -602,9 +586,9 @@ server <- function(input, output) {
 shinyApp(ui, server, options = list(height = 500))
 ```
 
-The shiny app makes it possible to see trends in countries of certain regions and how they compare to each other. For example, it is clear that Hungary and Czech Republic have the highest rates of assault in the Eastern European regions. This type of observation can be made with a few other countries as well. Each region has a separate country that stands out.
+The Shiny app makes it possible to see trends in countries of certain regions and how they compare to each other. For example, it is clear that Hungary and Czech Republic have the highest rates of assault in the Eastern European regions. This type of observation can be made with a few other countries as well. Each region has a separate country that stands out.
 
-Also, the lines through the points show that not all countries have data for every year. This can be a limitation, however, the methods used later will make use of the general trends and not data per country. The UNODC does not received a response from every country in a given year, so it is not feasible to assume that there are not missing informations.
+Also, the lines through the points show that not all countries have data for every year, which can be a limitation. The methods used later will make use of the general trends and not data per country. The UNODC does not receive a response from every country in a given year, so it is not feasible to assume that there are not missing informations.
 
 # Comparing Datasets/Variables
 
@@ -625,7 +609,7 @@ ggplot(data = spotify_by_year_small) +
         panel.grid.minor = element_line(color = "gray90"))
 ```
 
-(This is the same EDA graph from earlier, but we limited the years to just $2015$ to $2020$ because these are the only years available in our World Happiness dataset.)
+Figure \@ref(fig:valence-2015-2020) is a subsection of Figure \@ref(fig:scattervalyear), limited to the years 2015 to 2020, as these are the only years available in our happiness data. The above Figure \@ref(fig:valence-2015-2020) has a very similar trend to the happiness Figure \@ref(fig:happiness-over-time): after 2017, valence also steadily increases. The Spotify and happiness data sets are then combined in order to compare the valence and happiness.
 
 ```{r happiness-valence-lm}
 spotify_and_happiness <- left_join(spotify_by_year_small, happiness, by = c("year" = "year"))
@@ -639,7 +623,7 @@ ggplot(data = spotify_and_happiness) +
        caption = "SOURCE: World Happiness Report and Spotify")
 ```
 
-In Figure \@ref(fig:happiness-valence-lm), the music and happiness datasets were combined. In doing so, this means that each country now has one valence value, and one (mean) happiness score. There does appear to be a trend here: as the valence score increases, the mean happiness score also increases. However, this is a slightly inaccurate representation of, at the very least, happiness score because each country has different happiness scores.
+In Figure \@ref(fig:happiness-valence-lm), the music and happiness data sets were combined in order to compare valence and happiness score. In doing so, this means that each country now has one valence value, and one (mean) happiness score. There does appear to be a trend here: as the valence score increases, the mean happiness score also increases. However, this is a slightly inaccurate representation of, at the very least, happiness score because each country has different happiness scores. Because the happiness scores of each country is available each year, plotting that would be a better representation of happiness score.
 
 ```{r happy-box, fig.width=7, fig.height=5, fig.cap="Box plot of valence scores overlayed with points from the dataset"}
 spotify_by_year_small <- spotify_by_year %>% filter(year == 2015 | year == 2016 | year == 2017 | year == 2018 | year == 2019 | year == 2020)
@@ -660,7 +644,7 @@ plot00 <- ggplot(data = spotify_and_happiness, aes(x = as.factor(round(valence,4
 ggplotly(plot00, tooltip = "text")
 ```
 
-In Figure \@ref(fig:happy-box), each individual country's happiness score was plotted against a valence value with boxplots overlayed on top. The plot is interactive to display the country name, happiness score, and year of each point. Since the music dataset does not have a country variable, each year/country is still only associated with one valence value. Therefore, valence was treated as a categorical variable in the above plot in order to overlay the boxplots on top of the points, so the distance between the valence values are not proportionate. Though changes in the plot are very minute, it's visible to see in the last four boxplots that the median happiness score, as well as the 75th quantile, increases as the valence increases.
+In Figure \@ref(fig:happy-box), each individual country's happiness score was plotted against a valence value with boxplots overlayed on top. The plot is interactive to display the country name, happiness score, and year of each point. Since the music data set does not have a country variable, each year/country is still only associated with one valence value. Therefore, valence was treated as a categorical variable in the above plot in order to overlay the boxplots on top of the points, so the distance between the valence values are not proportionate. Though changes in the plot are very minute, it's visible to see in the last four boxplots that the median happiness score, as well as the 75th quantile, increases as the valence increases.
 
 ## Crime and Explicitness
 
@@ -701,25 +685,22 @@ all_together %>%
     theme_proj
 ```
 
-There were a few outliers, so the Log Rate of Crimes were used instead of the Rate on its own. The logistic regression was used since Explicit is a binary variable, but also because we opted to use percent explicit music. The logistic regressions do not show a great amount of relationship between the changes in Rate of Crime and explicit music. The strongest indicator is in Sexual Violence, which makes sense since this type of crime had the greatest increase. 
+There are a few outliers, so the Log Rate of Crimes was used instead of the Rate on its own on the x-axis. A logistic regression was used since Explicit is a binary variable, but also because we opted to use percent explicit music. The logistic regressions do not show a great amount of relationship between the changes in Rate of Crime and Explicit music. The strongest indicator is in Sexual Violence, which makes sense since this type of crime had the greatest increase. It appears that as the (log) rate of sexual violence went up, so does (percent) explicit music, whereas there is a negative trend between assault/robbery and percent explicit music.
 
 # Conclusions & Discussions
 
-Starting with the Spotify dataset and its various variables, it was possible to look at how music changed over time. Changes in music and happiness trends can be indicative of how the world is changing. The epochs associated with World War II had low valence (happiness) scores, and other epochs of relative peace and comfort had happier music. 
+Starting with the Spotify data set and its various variables, it was possible to look at how music changed over time. Changes in music and happiness trends can be indicative of how the world is changing. The epochs associated with World War II had low valence (happiness) scores, and other epochs of relative peace and comfort had happier music. 
 
-Looking at the spotify dataset it was possible to see more than variations across time and look into how variables such as acousticness and energy were negatively related. Other positive relationships were with variables such as loudness and popularity.
+Looking at the Spotify data set it was possible to see more than variations across time and look into how variables such as acousticness and energy were negatively related. Other positive relationships were with variables such as loudness and popularity. Looking at the different trends of music, we thought that it may be interesting to compare these trends to happiness and crime. Music has a strong impact on us as people, so it may reflect on trends in happiness or crime. 
 
-Looking at the different trends of music, we thought that it may be interesting to compare these trends to happiness and crime. Music has a strong impact on us as people, so it may reflect on trends in happiness or crime. 
+The happiness dataset came from the World Happiness Report, which assigns a happiness score for each country from 0 - 10 and also ranks the countries in order from happiest to least happy. Many other variables are used, including, but not limited to, health, government, and major socio-economic conditions. Data from 2015-2020 was used and compared with valence from the Spotify data set. 
 
-The happiness dataset came from the World Happiness Report which assigns a score for each country from 0 - 10 and also ranks the countries in order from most happy to least happy. Many factors are used, including, but not limited to, health, government, and major socio-economic conditions. Data from 2015-2020 was used and compared with valence from the Spotify dataset. 
+Over the different valence scores across the years, there did not seem to be a strong change in the median happiness score overall. This may require study, and it may be better to relate this data by region or some other subset of the global data. The reason for this is because countries that may have experienced major increases in happiness can be masked by the constantly low-scoring countries in these reports, and vice versa. It is notable that the past three years have seen general increases in both valence and happiness scores.
 
-Over the different valence scores across the years, there did not seem to be a strong change in the median happiness score overall. There may be more to study in this, and it may be better to relate this data by region or some other subset of the global data. The reason for this is because countries that may have experienced major increases in happiness can be masked by the constantly low-scoring countries in these reports. It is notable that the past three years have seen both increases in valence and happiness scores.
+The association between crime and explicit music resulted in a similar message. By exploring the crime data, it was possible to get a sense of how the different crimes changed over time. Sexual violence seems to be increasing over the years while the other types of crime, assault and robbery, are in stagnation or slight decrease. Of course, this changes depending on the region of the world but, on the whole, these are the trends found in this report.
 
-The association between crime and explicit music resulted in a similar message. Although, by exploring the crime data, it was possible to get a sense of how the different crimes changed over time. Sexual violence seems to be increasing over the years while the other types of crime, assault and robbery, are in stagnation or slight decrease. Of course, this changes by region of the world, however, on the whole, these are the trends.
+Explicit music, on the other hand, is definitely on the rise. We were interested in looking into whether this social expression of increased explicitness was connected to any rises in crime. The logistic regression model did not do much in proving this, because the two variables did not have a strong relationship. The only relationship was with a positive one between sexual violence percent explicit music. One takeaway is that sexual violence rates are on the rise, as well as explicit music. These two items, even if they are not connected strongly to each other, are both becoming more and more pervasive in our daily lives.
 
-Explicit music, on the other hand, is definitely on the rise. We were interested in looking into whether this social expression of increased explicitness was connected to any rises in crime. The logistic regression model did not do much in proving this, and did not have a strong relationship. The only positive relationship was with sexual violence. One takeaway is that sexual violence rates are on the rise, as well as explicit music. These two items, even if they are not connected strongly to each other, are both becoming more and more pervasive in our daily lives.
+It may seem spurious to correlate music and crime. As always, correlation is not causation, but it is important to understand that music is a form of art and expression, and societal tendencies can be expressed in the art of its time. As artists and people reflect on what is going on around them, they will produce or consume different types of music that may resonate with them and the current state of society at the time.
 
-It may seem spurious to correlate music and crime. As always, corellation is not causation, but it is important to understand that music is a form of art, and societal tendencies can be expressed in the art of its time. As artists and people reflect on what is going on around them, they will produce or consume different types of music that may resonate with them and the current state of society at the time.
-
-We used these three datasets to explore any trends, comparisons, and visualizations that may have meaning and insight. Lots of our visualizations have insights on how each set changed over time, and how these changes reflect between the datasets. 
-
+We used these three data sets to explore any trends, comparisons, and visualizations that may have meaning and insight. Lots of our visualizations have insights on how each set changed over time, and how these changes are reflected between the data sets. 
