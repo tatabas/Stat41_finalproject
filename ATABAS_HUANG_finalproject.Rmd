@@ -60,7 +60,7 @@ Additionally, music is not immune to the various societal trends that can morph 
 
 Other trends in music, and art in general, can illuminate more information. Seeing how artists express their views of the world provides a look into life during that given time period. Another advantage of music is that the popularity of a song or genre can be tracked. This is important because it not only gives insight on what songs are being produced in a given time, but also to what extent they are consumed. So, it is possible to look at both the expressed emotions in music and how much it resonates with listeners of that time.
 
-Changes in music is not strictly limited to different life periods, but it's also present in different phases of one’s life. For example, there is a popular practice of pregnant mothers playing classical music for their babies in hopes of making them more intelligent. In another phases of life, teens may be warned to stay away from certain genres of music because it will “rot their brains” or act as a bad influence. In either case, music enters our lives early and becomes a part of it ever since. Many young musical prodigies are discovered because they begin reacting to music even before they are able to speak or walk.
+Changes in music are not strictly limited to different life periods, but it's also present in different phases of one’s life. For example, there is a popular practice of pregnant mothers playing classical music for their babies in hopes of making them more intelligent. In another phases of life, teens may be warned to stay away from certain genres of music because it will “rot their brains” or act as a bad influence. In either case, music enters our lives early and becomes a part of it ever since. Many young musical prodigies are discovered because they begin reacting to music even before they are able to speak or walk.
 
 Our plan for this study relies on a comprehensive data set supplied by the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). This data encompasses many interesting variables, and there is much to experiment with. It provides a fertile ground for exploration of how music affects humans. There are several variables in the data set, including but not limited to year released, popularity, acousticness, etc. Two variables specifically are eye-catching: valence, a measure between 0 and 1 of the happiness of a track, and explicitness, a binary variable indicating whether a track contains explicit content (1) or not (0). There is a perceived trend that current music (2010-2020) is becoming more and more explicit and despairing. In fact, this can be seen in Figure \@ref(fig:scattervalyear); there appears to be a rise in valence after 1950, before dropping in valence a little after 1975.
 
@@ -79,9 +79,10 @@ This study aims to take a closer look at correlations between the music data set
 
 # Data
 
-The data sets used in this project required lots of work to clean and prepare for visualization and analysis. The data cleaning and code is outlines in the [ATABAS_HUANG_dataCleaning.Rmd file](https://github.com/tatabas/Stat41_finalproject), with short descriptions attached for each cleaning procedure.
+The data sets used in this project required lots of work to clean and prepare for visualization and analysis. The data cleaning and code is outlined in the [ATABAS_HUANG_dataCleaning.Rmd file](https://github.com/tatabas/Stat41_finalproject), with short descriptions attached for each cleaning procedure.
 
 **Music:**
+
 The music data set is made available through the [Spotify API](https://developer.spotify.com/documentation/web-api/reference-beta/#endpoint-get-audio-features). Spotify is an audio streaming service that was launched in 2008 and is now one of the most popular streaming platforms for music and podcasts. Therefore, the data set is fairly comprehensive and contains lots of  information due to Spotify’s status as one of the most popular sites for music consumption. 
 
 The data encompasses many interesting variables. There are descriptors such as artist or band name, year of song, genre, and key, but there are many other metrics. The two most note-worthy ones for this project include valence and explicitness. Spotify describes the metric for the valence (happiness) of a song as follows: “A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry)”. Explicitness is described as follows: “Whether or not the episode has explicit content (true = yes it does; false = no it does not OR unknown)”.
@@ -276,7 +277,9 @@ p1
 # credit to this tutorial: https://www.youtube.com/watch?v=RrtqBYLf404
 ```
 
-```{r happy-ridges, fig.width = 7, fig.height= 5,}
+```{r happy-ridges, fig.width = 7, fig.height= 6}
+library(ggridges)
+
 happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(5, 1), ])
 happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(15, 1), ])
 happiness_2015 <- rbind(happiness_2015, happiness_2015[rep(9, 1), ])
@@ -349,7 +352,7 @@ Continuing with the exploration, it is time to look at the crime data. The crime
 
 By plotting each type of crime over the years and by the region in Figure \@ref(fig:robbery) it is possible to see which types of crime are prevalent in which region, and there are also some notable changes over time. The changes over the years are present in some regions, but not in others. For example, Europe does not have much fluctuation in crime rates, whereas the Americas show a decline in Assault from 2010-2017. Additionally, Oceania has higher rates of Assault and Sexual Violence but lower rates of Robbery compared to other regions. 
 
-```{r robbery, fig.width = 9, fig.height= 5, fig.cap = "Rates of Crime by Year and Region"}
+```{r robbery, fig.width = 9, fig.height= 6, fig.cap = "Rates of Crime by Year and Region"}
 p1 <- assault %>%
   group_by(Year, Region) %>%
   summarise(
@@ -408,7 +411,7 @@ p1 + p2 + p3
 
 Looking at the crime data split by region allows for us to see that crime rates vary greatly across regions, and there are different trends within each specific type of crime. However, this idea also exists in specific countries of a given region. When viewed as a whole as in Figure \@ref(fig:not-region) below, it's apparent that globally, assault and robbery do not change much, but there is an increasing trend in sexual violence. This can be linked to various reasons: 1) sexual violence could be reported more than other crimes. 2) Changing laws and re-classifying certain types of assaults as sexual violence could lead to this increase. 3) Sexual violence could just be increasing around the world. In any way, there is a global increase in sexual violence crimes, according to the UNODC data.
 
-```{r not-region, fig.width = 9, fig.height = 5, fig.cap ="Rates of Crime by Type and Year"}
+```{r not-region, fig.width = 10, fig.height = 5, fig.cap ="Rates of Crime by Type and Year"}
 p1 <- assault %>%
   group_by(Year, Region) %>%
   summarise(
@@ -579,7 +582,7 @@ Also, the lines through the points show that not all countries have data for eve
 
 ## Valence and Happiness
 
-```{r valence-2015-2020}
+```{r valence-2015-2020, fig.cap = "Valence scores from 2015-2020"}
 spotify_by_year_small <- spotify_by_year %>% filter(year == 2015 | year == 2016 | year == 2017 | year == 2018 | year == 2019 | year == 2020)
 
 ggplot(data = spotify_by_year_small) +
@@ -598,7 +601,7 @@ Figure \@ref(fig:valence-2015-2020) is a subsection of Figure \@ref(fig:scatterv
 
 The Spotify and happiness data sets are then combined in order to compare the valence and happiness.
 
-```{r happiness-valence-lm}
+```{r happiness-valence-lm, fig.cap = "Comparing Happiness Scores and Valence Scores over the Years 2015-2020"}
 spotify_and_happiness <- left_join(spotify_by_year_small, happiness, by = c("year" = "year"))
 ggplot(data = spotify_and_happiness) +
   geom_point(mapping = aes(x = valence, y = mean)) +
@@ -633,7 +636,7 @@ plot00 <- ggplot(data = spotify_and_happiness, aes(x = as.factor(round(valence,4
 ggplotly(plot00, tooltip = "text")
 ```
 
-In Figure \@ref(fig:happy-box) above, each individual country's happiness score was plotted against a valence value with boxplots overlayed on top so that each point now represents a country, instead of a year. The plot is interactive to display the country name, happiness score, and year of each point. Unfortunately, since the music data set does not have a country variable, each data point (each country) is still only associated with one valence value, so each valence value essentially represents a year. Therefore, valence was treated as a categorical variable in the above plot in order to be able to overlay the boxplots on top of the points, so the distance between the valence values are not proportionate. It's visible to see in the last four boxplots that the median happiness score, as well as the 75th quantile, increases as the valence increases. THe changes are minute, but in Figure \@ref(fig:happiness-valence-lm), the changes are also very small, so they're consistent.
+In Figure \@ref(fig:happy-box) above, each individual country's happiness score was plotted against a valence value with boxplots overlayed on top so that each point now represents a country, instead of a year. The plot is interactive to display the country name, happiness score, and year of each point. Unfortunately, since the music data set does not have a country variable, each data point (each country) is still only associated with one valence value, so each valence value essentially represents a year. Therefore, valence was treated as a categorical variable in the above plot in order to be able to overlay the boxplots on top of the points, so the distance between the valence values are not proportionate. It's visible to see in the last four boxplots that the median happiness score, as well as the 75th quantile, increases as the valence increases. The changes are minute, but in Figure \@ref(fig:happiness-valence-lm), the changes are also very small, so they're consistent.
 
 Although it does appear that happiness score increases as valence increases in the last four boxplots, note that the last boxplot has a larger range in general. So while it looks as if happiness score is increasing, it could just be that the range of the score is increasing. Further investigation is required in order to fully compare these two variables.
 
